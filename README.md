@@ -117,6 +117,7 @@ const LINES = {
 Listy mogą mieć dowolną długość — wystarczy dopisać lub usunąć element tablicy,
 losowanie samo się dostosuje.
 
-Tekst otwierający (ten pokazywany zaraz po wejściu na stronę) ustawia
-`OPENING_BUBBLE_ID` i `OPENING_LINE` kawałek niżej — domyślnie trzeci tekst
-Johnny'ego. Częstotliwość zmiany dymków to `CYCLE_MS` (domyślnie 10 000 ms).
+Tekst otwierający (ten pokazywany zaraz po wejściu na stronę) ustawiają
+`OPENING_BUBBLE_ID` i `OPENING_LINE_INDEX` kawałek niżej — domyślnie trzeci
+tekst Johnny'ego. Częstotliwość zmiany dymków to `CYCLE_MS` (domyślnie
+10 000 ms).

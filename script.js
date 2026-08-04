@@ -74,7 +74,7 @@ function randomLine(bubbleId) {
 
 // Po wejsciu na strone zawsze leci ta odzywka, dopiero potem losowanie.
 const OPENING_BUBBLE_ID = "bubble-johny";
-const OPENING_LINE = LINES[OPENING_BUBBLE_ID][2];
+const OPENING_LINE_INDEX = 2;
 
 let nextBubbleId = OPENING_BUBBLE_ID;
 let cycleTimer = null;
@@ -133,6 +133,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 // start: stala odzywka Johnny'ego, po 10 sekundach karuzela przejmuje losowanie
-lastIndex[OPENING_BUBBLE_ID] = LINES[OPENING_BUBBLE_ID].indexOf(OPENING_LINE);
-displayBubble(document.getElementById(OPENING_BUBBLE_ID), OPENING_LINE);
+lastIndex[OPENING_BUBBLE_ID] = OPENING_LINE_INDEX;
+displayBubble(
+    document.getElementById(OPENING_BUBBLE_ID),
+    LINES[OPENING_BUBBLE_ID][OPENING_LINE_INDEX]
+);
 restartCycle();
