@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misja Vertigo</title>
     <meta name="description" content="Odliczanie do Misji Vertigo">
+
+    <!-- tlo siedzi w CSS, wiec bez tego przegladarka bierze sie za nie dopiero
+         po sparsowaniu arkusza - przy pierwszym wejsciu bylo widac biale tlo -->
+    <link rel="preload" as="image" href="pic/background.webp">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
+    <div class="splash" id="splash" role="status" aria-label="Ładowanie">
+        <div class="splash__dots"><span></span><span></span><span></span></div>
+    </div>
+
     <main class="scene">
 
         <header class="hud">
@@ -22,7 +31,7 @@
                     Baciata? 💃 To jakiś nowy framework czy da się to zainstalować?
                 </div>
                 <button class="char__btn" type="button" data-bubble="bubble-johny" aria-label="Kliknij Johnny'ego Bravo">
-                    <img class="char__img" src="pic/johny-bravo.png" alt="Johnny Bravo">
+                    <img class="char__img" src="pic/johny-bravo.webp" alt="Johnny Bravo" width="1024" height="1521" fetchpriority="high">
                 </button>
             </div>
 
@@ -31,7 +40,7 @@
                     Cześć, jestem małym głodomorkiem 🥺 Masz pampucha?
                 </div>
                 <button class="char__btn" type="button" data-bubble="bubble-deedee" aria-label="Kliknij Dee Dee">
-                    <img class="char__img" src="pic/dee-dee.png" alt="Dee Dee">
+                    <img class="char__img" src="pic/dee-dee.webp" alt="Dee Dee" width="1024" height="1529" fetchpriority="high">
                 </button>
             </div>
 

@@ -15,16 +15,43 @@ kliknięcie obok albo `Esc` chowa dymek — karuzela wraca po 10 sekundach.
 ## Zawartość
 
 ```
-index.html          struktura strony
-style.css           layout, tło, dymki, wersja mobilna
-script.js           licznik, teksty dymków, karuzela i kliknięcia
+index.html           struktura strony
+style.css            layout, tło, dymki, splash, wersja mobilna
+script.js            licznik, teksty dymków, karuzela i kliknięcia
 pic/
-  background.png    tło
-  johny-bravo.png   postać po lewej
-  dee-dee.png       postać po prawej
+  *.webp             pliki używane przez stronę
+  *.png              oryginały (nieużywane przez stronę, trzymane jako źródło)
 ```
 
 Zero zależności, zero builda — czysty HTML/CSS/JS.
+
+## Ładowanie i wydajność
+
+Pierwsze wejście z pustym cache składało się na oczach użytkownika: najpierw
+postacie na białym tle, po chwili dymek, a tło dopiero na końcu. Złożyły się na
+to trzy rzeczy i każda ma swoje lekarstwo:
+
+1. **Waga plików.** Trzy PNG-i ważyły łącznie 6,3 MB. Te same obrazki w WebP
+   to 368 KB, czyli 5,7% poprzedniego rozmiaru — bez widocznej różnicy w
+   jakości. Strona używa `.webp`, a PNG-i zostały w repo jako źródło.
+2. **Tło jest w CSS.** Przeglądarka dowiaduje się o nim dopiero po pobraniu i
+   sparsowaniu arkusza, więc startuje z nim jako ostatnim. Rozwiązuje to
+   `<link rel="preload" as="image">` w `index.html`.
+3. **Brak jednego momentu startu.** Splash (`#splash`) przykrywa scenę do
+   czasu, aż wszystkie trzy obrazki będą gotowe, i dopiero wtedy odsłania
+   całość. Karuzela dymków rusza razem z odsłonięciem, więc pierwsza odzywka
+   zawsze dostaje pełne 10 sekund.
+
+Splash ma bezpiecznik `SPLASH_TIMEOUT_MS` (8 s) — gdyby któryś obrazek nie
+doszedł, scena i tak się pokaże.
+
+Regenerowanie WebP (wymaga Pillow, `pip install pillow`):
+
+```bash
+python -c "from PIL import Image; im=Image.open('pic/background.png').convert('RGB'); im.save('pic/background.webp','WEBP',quality=70,method=6)"
+```
+
+Postacie zapisywane są tak samo, tyle że w trybie `RGBA` i z `quality=80`.
 
 ## Podgląd lokalny
 

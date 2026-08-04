@@ -49,13 +49,13 @@ const LINES = {
         "Poznaj siostrę mojej córki! Znaczy... córkę mojej siostry 🤯",
         "To jest chłopak mojej dziewczyny. CÓRKI! Chłopak mojej córki 😰",
         "Zamówiłem Ci kawę z mlekiem. Czyli mleko z kawą. Czyli krowę z ekspresu ☕🐄",
-        "Naprawię Ci wszystko, tylko najpierw zrestartuję. Router, laptopa i siebie 🔌"
+        "Zbackupowałem nasze zdjęcia z randki. Trzy kopie, jedna w chmurze 💾 Jestem romantyczny."
     ],
     "bubble-deedee": [
         "Cześć, jestem małym głodomorkiem 🥺 Masz pampucha?",
         "Lody czekoladowe to nie deser, to grupa żywieniowa 🍫🍦",
         "Wchodzimy na szczyt, robimy zdjęcie i schodzimy na lody ⛰️📸 Taki mam plan na życie.",
-        "Loki już wie, że idziemy w góry 🐕 Wziął smycz i czeka przy drzwiach.",
+        "Loki zjadł mojego pampucha 🐕 Wybaczyłam mu, bo miał taką minę.",
         "Zatańczysz ze mną baciatę? 💃 Spokojnie, w krótkich spodenkach też można 🩳",
         "Kawa bez mleka to nie kawa, to kara ☕🥛",
         "Owoce morza? Fuj! 🦑 Owoc to jest jabłko, a morze niech zostanie w morzu.",
@@ -141,10 +141,51 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") dismissBubbles();
 });
 
-// start: stala odzywka Johnny'ego, po 10 sekundach karuzela przejmuje losowanie
-lastIndex[OPENING_BUBBLE_ID] = OPENING_LINE_INDEX;
-displayBubble(
-    document.getElementById(OPENING_BUBBLE_ID),
-    LINES[OPENING_BUBBLE_ID][OPENING_LINE_INDEX]
-);
-restartCycle();
+// ---------- splash ----------
+
+// Bez tego przy pierwszym wejsciu (pusty cache) scena skladala sie na oczach
+// uzytkownika: najpierw postacie na bialym tle, potem dymek, na koncu tlo.
+// Splash schodzi dopiero, gdy wszystkie obrazki sa gotowe, a karuzela startuje
+// razem z nim - dzieki temu pierwsza odzywka zawsze dostaje pelne 10 sekund.
+
+const SPLASH_TIMEOUT_MS = 8000;
+const splash = document.getElementById("splash");
+
+function preloadImage(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = url;
+    });
+}
+
+function startBubbles() {
+    lastIndex[OPENING_BUBBLE_ID] = OPENING_LINE_INDEX;
+    displayBubble(
+        document.getElementById(OPENING_BUBBLE_ID),
+        LINES[OPENING_BUBBLE_ID][OPENING_LINE_INDEX]
+    );
+    restartCycle();
+}
+
+let sceneStarted = false;
+
+function revealScene() {
+    if (sceneStarted) return;
+    sceneStarted = true;
+
+    startBubbles();
+    splash.classList.add("is-hidden");
+    splash.addEventListener("transitionend", () => splash.remove(), { once: true });
+}
+
+const assets = [preloadImage("pic/background.webp")];
+document.querySelectorAll(".char__img").forEach((img) => {
+    if (!img.complete) assets.push(preloadImage(img.src));
+});
+
+Promise.all(assets).then(revealScene);
+
+// bezpiecznik: gdyby ktorys obrazek nie chcial dojsc, sceny i tak nie blokujemy
+setTimeout(revealScene, SPLASH_TIMEOUT_MS);
