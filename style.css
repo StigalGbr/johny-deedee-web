@@ -1,0 +1,249 @@
+/* ---------- podstawy ---------- */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Verdana, sans-serif;
+    background-color: #1b1b2f;
+    background-image: url("pic/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow: hidden;
+}
+
+/* ---------- scena ---------- */
+
+.scene {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* ---------- napis + licznik ---------- */
+
+.hud {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 3vh 1rem 0;
+    pointer-events: none;
+}
+
+.title {
+    font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    letter-spacing: 0.12em;
+    color: #ffd93b;
+    text-transform: uppercase;
+    line-height: 1;
+    -webkit-text-stroke: 3px #1a1a1a;
+    paint-order: stroke fill;
+    text-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+.countdown {
+    margin-top: 1.2rem;
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    font-size: clamp(1rem, 3vw, 2rem);
+    font-weight: 700;
+    color: #fff;
+    background: rgba(20, 20, 30, 0.62);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+}
+
+.countdown.is-finished {
+    background: rgba(200, 30, 30, 0.75);
+    border-color: #ffd93b;
+}
+
+/* ---------- postacie ---------- */
+
+.stage {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 2vw;
+}
+
+.char {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+}
+
+.char__btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    line-height: 0;
+    transition: transform 0.18s ease;
+    transform-origin: bottom center;
+}
+
+.char__btn:hover,
+.char__btn:focus-visible {
+    transform: scale(1.04);
+    outline: none;
+}
+
+.char__img {
+    display: block;
+    height: min(68vh, 68dvh);
+    width: auto;
+    max-width: 46vw;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* ---------- dymki ---------- */
+
+.bubble {
+    position: absolute;
+    bottom: 68%;
+    z-index: 5;
+    width: max-content;
+    max-width: min(38ch, 34vw);
+    padding: 1rem 1.3rem;
+    font-size: clamp(0.9rem, 1.4vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.35;
+    color: #16161d;
+    background: #fff;
+    border: 3px solid #16161d;
+    border-radius: 26px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    animation: bubble-pop 0.22s ease-out;
+}
+
+.bubble[hidden] {
+    display: none;
+}
+
+.bubble--johny {
+    left: 55%;
+}
+
+.bubble--deedee {
+    right: 55%;
+}
+
+/* ogonek dymka: warstwa obrysu + warstwa wypełnienia */
+.bubble::before,
+.bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.bubble--johny::before {
+    left: 30px;
+    border-width: 26px 22px 0 0;
+    border-color: #16161d transparent transparent transparent;
+}
+
+.bubble--johny::after {
+    left: 35px;
+    border-width: 19px 15px 0 0;
+    border-color: #fff transparent transparent transparent;
+}
+
+.bubble--deedee::before {
+    right: 30px;
+    border-width: 26px 0 0 22px;
+    border-color: #16161d transparent transparent transparent;
+}
+
+.bubble--deedee::after {
+    right: 35px;
+    border-width: 19px 0 0 15px;
+    border-color: #fff transparent transparent transparent;
+}
+
+@keyframes bubble-pop {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ---------- mobile ---------- */
+
+@media (max-width: 768px) {
+    .hud {
+        padding-top: 2vh;
+    }
+
+    .countdown {
+        margin-top: 0.7rem;
+        padding: 0.45rem 1rem;
+    }
+
+    .stage {
+        padding: 0;
+    }
+
+    .char__img {
+        height: min(45vh, 45dvh);
+        max-width: 48vw;
+    }
+
+    .bubble {
+        max-width: 42vw;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.8rem;
+        border-radius: 18px;
+        border-width: 2px;
+    }
+
+    .bubble--johny {
+        left: 25%;
+    }
+
+    .bubble--deedee {
+        right: 25%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .bubble,
+    .char__btn {
+        animation: none;
+        transition: none;
+    }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertigo</title>
+    <meta name="description" content="Odliczanie do Vertigo">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="scene">
+
+        <header class="hud">
+            <h1 class="title">VERTIGO</h1>
+            <p class="countdown" id="countdown" aria-live="polite">Pozostało 0h 0min 0 sek</p>
+        </header>
+
+        <div class="stage">
+
+            <div class="char char--johny">
+                <div class="bubble bubble--johny" id="bubble-johny" hidden>
+                    Widziałeś gdzieś moje okulary, zapomniałem ich zabrać
+                </div>
+                <button class="char__btn" type="button" data-bubble="bubble-johny" aria-label="Kliknij Johnny'ego Bravo">
+                    <img class="char__img" src="pic/johny-bravo.png" alt="Johnny Bravo">
+                </button>
+            </div>
+
+            <div class="char char--deedee">
+                <div class="bubble bubble--deedee" id="bubble-deedee" hidden>
+                    Cześć, jestem małym głodomorkiem. Masz pampucha?
+                </div>
+                <button class="char__btn" type="button" data-bubble="bubble-deedee" aria-label="Kliknij Dee Dee">
+                    <img class="char__img" src="pic/dee-dee.png" alt="Dee Dee">
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
