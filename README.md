@@ -80,14 +80,24 @@ Kolejne fazy tej sekwencji chodzą na `setTimeout`, a nie na `onfinish`
 animacji. Animacje są wstrzymywane w karcie w tle i sekwencja zatrzymałaby się
 w połowie, zostawiając pająka na ekranie i blokadę na kolejne wywołania.
 
-**Badminton.** Przycisk `🏸` w prawym górnym rogu otwiera grę: pong z
-postaciami, gdzie rakietka ma tylko dwa stany — góra albo dół. Myszą, palcem
-albo strzałkami wybierasz połowę, w której chcesz odebrać. Animacja to dwa
-sprite'y na postać, przełączane w miejscu. Pasek przy krawędzi pokazuje
-zasięg odbicia, bo sam sprite nie mówi dokładnie, gdzie kończy się rakietka.
-Dee Dee gra jako przeciwnik i myli się w 14% przypadków, więc da się z nią
-wygrać i przegrać. Do pięciu punktów. Cała gra siedzi w [`game.js`](game.js),
-a jej stałe (prędkość, zasięg rakietki, poziom trudności) są na górze pliku.
+**Gry.** Przycisk `🏸` w prawym górnym rogu otwiera planszę z wyborem dwóch
+trybów. Oba siedzą w [`game.js`](game.js), w obiektach `MODES` — wspólna jest
+tylko obsługa płótna, pętli i menu, a każdy tryb ma własne stałe na górze
+swojej sekcji.
+
+*Badminton* — pong z postaciami, gdzie rakietka ma tylko dwa stany: góra albo
+dół. Grasz Dee Dee po prawej, Johnny jest komputerem i myli się w 14% odbić,
+więc da się z nim wygrać i przegrać. Animacja to dwa sprite'y na postać,
+przełączane w miejscu. Pasek przy krawędzi pokazuje zasięg odbicia, bo sam
+sprite nie mówi dokładnie, gdzie kończy się rakietka — jego pozycja liczy się
+z szerokości postaci, żeby wypadał przy rakietce, a nie w poprzek tułowia.
+Do pięciu punktów.
+
+*Obrona Dee Dee* — pająki idą z lewej w jej stronę, klikasz w nie, żeby Johnny
+rozwalił je z bazooki. Każdy, który przekroczy czerwoną linię, zabiera życie;
+są trzy. Tempo rośnie z każdym ubitym pająkiem: odstęp między nimi schodzi z 95
+do 28 klatek, a prędkość rośnie liniowo. Tryb bez końca, wynik to liczba
+ubitych.
 
 **Tryb nerda.** Pięć kliknięć w Johnny'ego pod rząd zmienia tło w zielony
 deszcz zer i jedynek, a jego kwestie w kod binarny. Wyłącza się sam po 25

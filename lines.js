@@ -93,13 +93,28 @@ const REACTIONS = {
     nerdModeOn: "Wchodzę w tryb nerda 🟩 Od teraz mówię binarnie."
 };
 
-// Teksty w trybie gry.
+// Teksty w trybach gry.
 const GAME_TEXTS = {
-    title: "Badminton",
-    hint: "Myszką albo palcem: góra ekranu — rakietka w górę, dół — w dół",
-    winJohny: "Johnny wygrywa! Zaraz wyjaśni, że to była kwestia optymalizacji 🏸",
-    winDeedee: "Dee Dee wygrywa! Idziemy na lody 🍦",
-    toWin: 5
+    menuTitle: "W co gramy?",
+
+    badminton: {
+        name: "Badminton",
+        icon: "🏸",
+        blurb: "Grasz Dee Dee. Johnny po drugiej stronie siatki.",
+        hint: "Myszką albo palcem: góra ekranu — rakietka w górę, dół — w dół",
+        winPlayer: "Wygrywasz! Johnny zaraz wyjaśni, że to była kwestia optymalizacji 🏸",
+        winCpu: "Johnny wygrywa. Poszedł świętować i zgubił okulary 🤓",
+        toWin: 5
+    },
+
+    obrona: {
+        name: "Obrona Dee Dee",
+        icon: "🕷️",
+        blurb: "Pająki idą po Dee Dee. Johnny ma bazookę, Ty masz celownik.",
+        hint: "Klikaj w pająki, zanim dojdą do Dee Dee. Trzy życia.",
+        over: "Koniec. Dee Dee poszła na lody, a pająki zostały 🕷️🍦",
+        lives: 3
+    }
 };
 
 // Tryb nerda: te zdania sa zamieniane na kod binarny w locie.

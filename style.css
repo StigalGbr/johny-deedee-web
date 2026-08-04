@@ -677,14 +677,111 @@ body.is-nerd .bubble--johny::before {
     border-color: #ffd93b;
 }
 
+/* Plansza i wszystko, co ja przykrywa. Menu i podsumowanie zaslaniaja tylko
+   ten blok, a nie cale okno - inaczej lezaly na pasku i krzyzyk zamkniecia
+   byl nieklikalny. */
+.game__stack {
+    position: relative;
+    width: min(900px, 96vw);
+}
+
 .game__canvas {
     display: block;
-    width: min(900px, 96vw);
+    width: 100%;
     border: 3px solid rgba(255, 255, 255, 0.35);
     border-radius: 16px;
     background: linear-gradient(180deg, #1d2440, #0d1020);
     touch-action: none;
-    cursor: none;
+}
+
+.game__back {
+    padding: 0.4rem 0.8rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.game__back[hidden] {
+    display: none;
+}
+
+.game__back:hover {
+    border-color: #ffd93b;
+}
+
+/* ---------- wybor gry ---------- */
+
+.game__menu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    padding: 1rem;
+    background: rgba(10, 6, 10, 0.72);
+    border-radius: 16px;
+}
+
+.game__menu[hidden] {
+    display: none;
+}
+
+.game__menu-title {
+    font-size: clamp(1.1rem, 3vw, 1.7rem);
+    color: #fff;
+}
+
+.game__menu-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.game__pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    width: min(15rem, 40vw);
+    padding: 1.1rem 1rem;
+    font: inherit;
+    color: #16161d;
+    background: #fff;
+    border: 3px solid #16161d;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.game__pick:hover,
+.game__pick:focus-visible {
+    transform: translateY(-3px);
+    background: #ffd93b;
+    outline: none;
+}
+
+.game__pick-icon {
+    font-size: 1.8rem;
+}
+
+.game__pick-name {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.game__pick-blurb {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    text-align: center;
+    opacity: 0.75;
 }
 
 .game__hint {
@@ -702,6 +799,7 @@ body.is-nerd .bubble--johny::before {
     justify-content: center;
     gap: 1.2rem;
     background: rgba(10, 6, 10, 0.82);
+    border-radius: 16px;
 }
 
 .game__over[hidden] {
@@ -854,6 +952,33 @@ body.is-nerd .bubble--johny::before {
 
     .plan {
         top: 50px;
+    }
+
+    /* na waskim ekranie plansza jest niska, wiec kafle wyboru gry musza sie
+       skrocic - z opisem wychodzily poza ciemny panel */
+    .game__menu {
+        gap: 0.8rem;
+    }
+
+    /* oba kafle musza zmiescic sie w jednym rzedzie, inaczej drugi wychodzi
+       pod dolna krawedz panelu */
+    .game__pick {
+        width: 38vw;
+        padding: 0.7rem 0.5rem;
+        border-width: 2px;
+        border-radius: 14px;
+    }
+
+    .game__pick-icon {
+        font-size: 1.4rem;
+    }
+
+    .game__pick-name {
+        font-size: 0.85rem;
+    }
+
+    .game__pick-blurb {
+        display: none;
     }
 }
 
