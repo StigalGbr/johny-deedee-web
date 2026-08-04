@@ -18,6 +18,8 @@ game.js              badminton
 pic/
   *.webp             pliki używane przez stronę
   *.png              oryginały (nieużywane przez stronę, trzymane jako źródło)
+media/
+  vertigo.mp4        klip pod przyciskiem 🎬
 ```
 
 ### Sprite'y postaci
@@ -79,6 +81,12 @@ przycisk odpala całą sekwencję na komputerze.
 Kolejne fazy tej sekwencji chodzą na `setTimeout`, a nie na `onfinish`
 animacji. Animacje są wstrzymywane w karcie w tle i sekwencja zatrzymałaby się
 w połowie, zostawiając pająka na ekranie i blokadę na kolejne wywołania.
+
+**Film.** Przycisk `🎬` pod przyciskiem gier otwiera pięciosekundowy klip
+z dźwiękiem. Plik ma `preload="none"`, bo waży 2,16 MB — ponad cztery razy
+tyle co cała reszta strony — i nie ma się ruszać, dopóki ktoś go nie włączy.
+Dźwięk gra, bo odtwarzanie startuje z kliknięcia; przeglądarki blokują tylko
+automatyczny start z dźwiękiem, bez żadnego gestu użytkownika.
 
 **Gry.** Przycisk `🎮` w prawym górnym rogu otwiera planszę z wyborem dwóch
 trybów. Oba siedzą w [`game.js`](game.js), w obiektach `MODES` — wspólna jest

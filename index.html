@@ -15,7 +15,7 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -75,6 +75,20 @@
         🎮<span class="game-toggle__label">Gry</span>
     </button>
 
+    <!-- film -->
+    <button class="movie-toggle" id="movie-toggle" type="button" aria-label="Obejrzyj film">
+        🎬<span class="movie-toggle__label">Film</span>
+    </button>
+
+    <div class="movie" id="movie" hidden>
+        <button class="movie__close" id="movie-close" type="button" aria-label="Zamknij film">✕</button>
+
+        <!-- preload none, bo film wazy ponad cztery razy tyle co cala reszta
+             strony - ma ruszyc dopiero, gdy ktos go wlaczy -->
+        <video class="movie__player" id="movie-player" controls playsinline preload="none"
+            src="media/vertigo.mp4"></video>
+    </div>
+
     <div class="game" id="game" hidden>
         <div class="game__bar">
             <button class="game__back" id="game-back" type="button" hidden>◀ Menu</button>
@@ -117,8 +131,8 @@
         <span class="final-count__label">sekund</span>
     </div>
 
-    <script src="lines.js?v=2"></script>
-    <script src="script.js?v=2"></script>
-    <script src="game.js?v=2"></script>
+    <script src="lines.js?v=3"></script>
+    <script src="script.js?v=3"></script>
+    <script src="game.js?v=3"></script>
 </body>
 </html>

@@ -707,6 +707,53 @@ planToggle.addEventListener("click", (event) => {
 planEl.addEventListener("click", (event) => event.stopPropagation());
 
 // ============================================================
+//  FILM
+// ============================================================
+
+// Dzwiek gra, bo odtwarzanie startuje z klikniecia uzytkownika. Przegladarki
+// blokuja tylko automatyczny start z dzwiekiem, bez zadnego gestu.
+
+const movieEl = el("movie");
+const player = el("movie-player");
+
+function openMovie() {
+    movieEl.hidden = false;
+    player.currentTime = 0;
+    player.muted = false;
+    player.play().catch(() => { });
+
+    // scena zamiera na czas filmu, zeby dymki nie gadaly zza odtwarzacza
+    clearDialogTimers();
+    hideBubbles();
+}
+
+function closeMovie() {
+    player.pause();
+    movieEl.hidden = true;
+    scheduleNextDialog(1000);
+}
+
+el("movie-toggle").addEventListener("click", (event) => {
+    event.stopPropagation();
+    openMovie();
+});
+
+el("movie-close").addEventListener("click", (event) => {
+    event.stopPropagation();
+    closeMovie();
+});
+
+movieEl.addEventListener("click", (event) => {
+    event.stopPropagation();
+    // klikniecie w tlo obok odtwarzacza zamyka
+    if (event.target === movieEl) closeMovie();
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !movieEl.hidden) closeMovie();
+});
+
+// ============================================================
 //  ROZMIARY PLOTEN
 // ============================================================
 

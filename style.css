@@ -585,6 +585,82 @@ body.is-nerd .bubble--johny::before {
     border-top-color: #7dff8a;
 }
 
+/* ---------- film ---------- */
+
+/* pod przyciskiem gier, bo gora jest zajeta przez licznik, a ukladanie
+   w pionie omija ciasnote na waskich ekranach */
+.movie-toggle {
+    position: fixed;
+    top: 58px;
+    right: 12px;
+    z-index: 9;
+    padding: 0.5rem 0.9rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(20, 20, 30, 0.62);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.movie-toggle:hover,
+.movie-toggle:focus-visible {
+    border-color: #ffd93b;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.movie-toggle__label {
+    margin-left: 0.4rem;
+}
+
+.movie {
+    position: fixed;
+    inset: 0;
+    z-index: 46;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(6, 4, 8, 0.92);
+    backdrop-filter: blur(3px);
+}
+
+.movie[hidden] {
+    display: none;
+}
+
+.movie__player {
+    width: min(960px, 96vw);
+    max-height: 82vh;
+    border-radius: 14px;
+    background: #000;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.movie__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 2.4rem;
+    height: 2.4rem;
+    font: inherit;
+    font-size: 1.1rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.movie__close:hover {
+    border-color: #ffd93b;
+}
+
 /* ---------- tryb gry ---------- */
 
 .game-toggle {
@@ -941,13 +1017,19 @@ body.is-nerd .bubble--johny::before {
     }
 
     .plan-toggle__label,
-    .game-toggle__label {
+    .game-toggle__label,
+    .movie-toggle__label {
         display: none;
     }
 
-    .game-toggle {
+    .game-toggle,
+    .movie-toggle {
         font-size: 0.95rem;
         padding: 0.35rem 0.5rem;
+    }
+
+    .movie-toggle {
+        top: 55px;
     }
 
     .plan {
