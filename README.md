@@ -3,17 +3,20 @@
 Prosta statyczna strona: tło, dwie klikalne postacie i licznik odliczający do
 **5 sierpnia 2026, 20:00 czasu polskiego**.
 
-Kliknięcie w postać pokazuje dymek z losowo wybranym tekstem — każda postać ma
-pulę pięciu odzywek i ta sama nie wypada dwa razy pod rząd. Dymek znika po
-ponownym kliknięciu, po kliknięciu obok, klawiszem `Esc` albo automatycznie
-po 6 sekundach.
+Dymki chodzą same, bez klikania: po wejściu na stronę zawsze odzywa się Johnny
+tekstem o baciacie, a potem co 10 sekund głos przejmuje na przemian druga
+postać — już z losowaniem. Ta sama odzywka nie wypada dwa razy pod rząd.
+
+Kliknięcie w postać przerywa kolejkę i od razu pokazuje jej nowy tekst
+(odliczanie 10 sekund startuje od nowa). Ponowne kliknięcie w gadającą postać,
+kliknięcie obok albo `Esc` chowa dymek — karuzela wraca po 10 sekundach.
 
 ## Zawartość
 
 ```
 index.html          struktura strony
 style.css           layout, tło, dymki, wersja mobilna
-script.js           licznik + obsługa kliknięć
+script.js           licznik, teksty dymków, karuzela i kliknięcia
 pic/
   background.png    tło
   johny-bravo.png   postać po lewej
@@ -113,3 +116,7 @@ const LINES = {
 
 Listy mogą mieć dowolną długość — wystarczy dopisać lub usunąć element tablicy,
 losowanie samo się dostosuje.
+
+Tekst otwierający (ten pokazywany zaraz po wejściu na stronę) ustawia
+`OPENING_BUBBLE_ID` i `OPENING_LINE` kawałek niżej — domyślnie trzeci tekst
+Johnny'ego. Częstotliwość zmiany dymków to `CYCLE_MS` (domyślnie 10 000 ms).

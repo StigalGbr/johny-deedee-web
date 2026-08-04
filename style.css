@@ -33,30 +33,17 @@ body {
     justify-content: space-between;
 }
 
-/* ---------- napis + licznik ---------- */
+/* ---------- licznik ---------- */
 
 .hud {
     position: relative;
     z-index: 3;
     text-align: center;
-    padding: 3vh 1rem 0;
+    padding: 4vh 1rem 0;
     pointer-events: none;
 }
 
-.title {
-    font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-    font-size: clamp(2.5rem, 9vw, 7rem);
-    letter-spacing: 0.12em;
-    color: #ffd93b;
-    text-transform: uppercase;
-    line-height: 1;
-    -webkit-text-stroke: 3px #1a1a1a;
-    paint-order: stroke fill;
-    text-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
-}
-
 .countdown {
-    margin-top: 1.2rem;
     display: inline-block;
     padding: 0.6rem 1.4rem;
     font-size: clamp(1rem, 3vw, 2rem);
@@ -105,17 +92,19 @@ body {
     transform-origin: bottom center;
 }
 
+/* podskok zamiast skalowania - skalowanie rosnie w gore proporcjonalnie
+   do wysokosci postaci i przy duzych ekranach wchodzilo w dymek */
 .char__btn:hover,
 .char__btn:focus-visible {
-    transform: scale(1.04);
+    transform: translateY(-6px);
     outline: none;
 }
 
 .char__img {
     display: block;
-    height: min(68vh, 68dvh);
+    height: min(64vh, 64dvh);
     width: auto;
-    max-width: 46vw;
+    max-width: 44vw;
     object-fit: contain;
     filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
     user-select: none;
@@ -124,12 +113,13 @@ body {
 
 /* ---------- dymki ---------- */
 
+/* dymek siedzi calkowicie nad postacia, zeby nie zaslanial jej twarzy */
 .bubble {
     position: absolute;
-    bottom: 68%;
+    bottom: calc(100% + 20px);
     z-index: 5;
     width: max-content;
-    max-width: min(38ch, 34vw);
+    max-width: min(46ch, 40vw);
     padding: 1rem 1.3rem;
     font-size: clamp(0.9rem, 1.4vw, 1.25rem);
     font-weight: 600;
@@ -147,11 +137,11 @@ body {
 }
 
 .bubble--johny {
-    left: 55%;
+    left: 30%;
 }
 
 .bubble--deedee {
-    right: 55%;
+    right: 30%;
 }
 
 /* ogonek dymka: warstwa obrysu + warstwa wypełnienia */
@@ -201,6 +191,23 @@ body {
     }
 }
 
+/* ---------- niskie ekrany: robimy miejsce na dymki nad postaciami ---------- */
+
+@media (max-height: 760px) {
+    .hud {
+        padding-top: 3vh;
+    }
+
+    .countdown {
+        padding: 0.45rem 1.1rem;
+        font-size: clamp(0.95rem, 2.2vw, 1.5rem);
+    }
+
+    .char__img {
+        height: min(58vh, 58dvh);
+    }
+}
+
 /* ---------- mobile ---------- */
 
 @media (max-width: 768px) {
@@ -218,12 +225,16 @@ body {
     }
 
     .char__img {
-        height: min(45vh, 45dvh);
-        max-width: 48vw;
+        /* na waskim ekranie o rozmiarze decyduje szerokosc, nie wysokosc */
+        width: 46vw;
+        height: auto;
+        max-width: none;
+        max-height: 56vh;
     }
 
     .bubble {
-        max-width: 42vw;
+        bottom: calc(100% + 16px);
+        max-width: 46vw;
         padding: 0.7rem 0.9rem;
         font-size: 0.8rem;
         border-radius: 18px;
@@ -231,11 +242,11 @@ body {
     }
 
     .bubble--johny {
-        left: 25%;
+        left: 12%;
     }
 
     .bubble--deedee {
-        right: 25%;
+        right: 12%;
     }
 }
 
