@@ -5,7 +5,8 @@ Prosta statyczna strona: tło, dwie klikalne postacie i licznik odliczający do
 
 Dymki chodzą same, bez klikania: po wejściu na stronę zawsze odzywa się Johnny
 tekstem o baciacie, a potem co 10 sekund głos przejmuje na przemian druga
-postać — już z losowaniem. Ta sama odzywka nie wypada dwa razy pod rząd.
+postać — już z losowaniem. Każda ma pulę dziesięciu odzywek i ta sama nie
+wypada dwa razy pod rząd.
 
 Kliknięcie w postać przerywa kolejkę i od razu pokazuje jej nowy tekst
 (odliczanie 10 sekund startuje od nowa). Ponowne kliknięcie w gadającą postać,

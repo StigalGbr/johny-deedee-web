@@ -45,14 +45,23 @@ const LINES = {
         "Baciata? 💃 To jakiś nowy framework czy da się to zainstalować?",
         "Za moich czasów telefon miał kabel ☎️ a randka miała długie spodnie.",
         "Zrobiłem Ci excela z trasami w góry 📊 Dwanaście zakładek, filtry i wykres przewyższeń.",
-        "Emotki w wiadomościach? Kto to widział takie fanaberie 🙄"
+        "Emotki w wiadomościach? Kto to widział takie fanaberie 🙄",
+        "Poznaj siostrę mojej córki! Znaczy... córkę mojej siostry 🤯",
+        "To jest chłopak mojej dziewczyny. CÓRKI! Chłopak mojej córki 😰",
+        "Zamówiłem Ci kawę z mlekiem. Czyli mleko z kawą. Czyli krowę z ekspresu ☕🐄",
+        "Naprawię Ci wszystko, tylko najpierw zrestartuję. Router, laptopa i siebie 🔌"
     ],
     "bubble-deedee": [
         "Cześć, jestem małym głodomorkiem 🥺 Masz pampucha?",
         "Lody czekoladowe to nie deser, to grupa żywieniowa 🍫🍦",
         "Wchodzimy na szczyt, robimy zdjęcie i schodzimy na lody ⛰️📸 Taki mam plan na życie.",
         "Loki już wie, że idziemy w góry 🐕 Wziął smycz i czeka przy drzwiach.",
-        "Zatańczysz ze mną baciatę? 💃 Spokojnie, w krótkich spodenkach też można 🩳"
+        "Zatańczysz ze mną baciatę? 💃 Spokojnie, w krótkich spodenkach też można 🩳",
+        "Kawa bez mleka to nie kawa, to kara ☕🥛",
+        "Owoce morza? Fuj! 🦑 Owoc to jest jabłko, a morze niech zostanie w morzu.",
+        "Pająk w łazience?! 🕷️ Loki, do ataku! ...Loki, wracaj natychmiast!",
+        "Pająk siedzi na moim laptopie 🕷️💻 Ty jesteś od komputerów, więc technicznie to Twoja działka.",
+        "Zrobisz mi excela, ile lodów mogę zjeść w tygodniu? 📊🍦 Ale tak, żeby wyszło dużo."
     ]
 };
 
