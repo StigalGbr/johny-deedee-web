@@ -8,6 +8,8 @@
 
     <!-- tlo siedzi w CSS, wiec bez tego przegladarka bierze sie za nie dopiero
          po sparsowaniu arkusza - przy pierwszym wejsciu bylo widac biale tlo -->
+    <!-- splash pokazuje sie pierwszy, wiec jego zdjecie ma pierwszenstwo -->
+    <link rel="preload" as="image" href="pic/splash.webp">
     <link rel="preload" as="image" href="pic/background.webp">
 
     <!-- GitHub Pages serwuje wszystko z max-age=600, wiec przegladarka trzyma
@@ -15,12 +17,21 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
     <div class="splash" id="splash" role="status" aria-label="Ładowanie">
-        <div class="splash__dots"><span></span><span></span><span></span></div>
+        <div class="splash__hearts" id="splash-hearts" aria-hidden="true"></div>
+
+        <h1 class="splash__title" id="splash-title"></h1>
+
+        <img class="splash__photo" src="pic/splash.webp" alt="Johnny Bravo i Dee Dee" width="987" height="666"
+            fetchpriority="high">
+
+        <div class="splash__bar">
+            <span class="splash__fill" id="splash-fill"></span>
+        </div>
     </div>
 
     <canvas class="matrix" id="matrix" aria-hidden="true"></canvas>
@@ -131,8 +142,8 @@
         <span class="final-count__label">sekund</span>
     </div>
 
-    <script src="lines.js?v=3"></script>
-    <script src="script.js?v=3"></script>
-    <script src="game.js?v=3"></script>
+    <script src="lines.js?v=4"></script>
+    <script src="script.js?v=4"></script>
+    <script src="game.js?v=4"></script>
 </body>
 </html>

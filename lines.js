@@ -82,6 +82,10 @@ const DIALOGS = [
 // Dialog pokazywany zaraz po wejsciu na strone.
 const OPENING_DIALOG_INDEX = 0;
 
+// Napis na ekranie powitalnym. Kazda litera dostaje losowy krój i kolor,
+// wiec dziala tu dowolny tekst - im krotszy, tym czytelniej.
+const SPLASH_TITLE = "Misja Vertigo";
+
 // Finał, czyli co postacie mowia po dojsciu licznika do zera.
 const FINALE_LINE = "No to lecimy! 💃🍦";
 

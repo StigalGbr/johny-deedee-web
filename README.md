@@ -142,12 +142,30 @@ to trzy rzeczy i każda ma swoje lekarstwo:
    sparsowaniu arkusza, więc startuje z nim jako ostatnim. Rozwiązuje to
    `<link rel="preload" as="image">` w `index.html`.
 3. **Brak jednego momentu startu.** Splash (`#splash`) przykrywa scenę do
-   czasu, aż wszystkie trzy obrazki będą gotowe, i dopiero wtedy odsłania
-   całość. Karuzela dymków rusza razem z odsłonięciem, więc pierwsza odzywka
-   zawsze dostaje pełne 10 sekund.
+   czasu, aż wszystkie obrazki będą gotowe, i dopiero wtedy odsłania całość.
+   Karuzela dymków rusza razem z odsłonięciem, więc pierwsza odzywka zawsze
+   dostaje pełne 10 sekund.
 
-Splash ma bezpiecznik `SPLASH_TIMEOUT_MS` (8 s) — gdyby któryś obrazek nie
-doszedł, scena i tak się pokaże.
+### Ekran powitalny
+
+Splash to zdjęcie pary, pod nim pasek postępu, nad nim napis złożony
+z pojedynczych liter — każda innym krojem i kolorem, z własnym przechyłem
+i bujaniem. W tle unoszą się serduszka, a zdjęcie oddycha.
+
+Splash schodzi dopiero, gdy spełnione są **oba** warunki: obrazki gotowe
+**i** minął `SPLASH_MIN_MS` (5,5 s). Samo czekanie na pliki trwa ułamek
+sekundy, a ekran ma być widoczny. Zmierzone: odsłonięcie sceny po 5590 ms,
+pasek przechodzi płynnie od 0% do 100%.
+
+Dopóki obrazki nie są gotowe, pasek zatrzymuje się na 97% — nie ogłasza
+gotowości, której nie ma. Bezpiecznik `SPLASH_TIMEOUT_MS` (12 s) odsłania
+scenę nawet wtedy, gdy któryś plik nie dojdzie.
+
+Pasek chodzi na `setInterval`, nie na `requestAnimationFrame` — ten drugi
+jest wstrzymywany w karcie w tle i pasek zamarzałby zamiast po cichu dobiec
+do końca. Splash jest też zdejmowany z drzewa awaryjnym `setTimeout`, bo
+`transitionend` nie przychodzi, gdy karta jest w tle albo przejścia są
+wyłączone w systemie.
 
 ### Numer wersji przy plikach
 

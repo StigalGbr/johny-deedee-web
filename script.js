@@ -11,7 +11,23 @@ const DEFAULT_TARGET = "2026-08-05T20:00:00+02:00";
 
 const CYCLE_MS = 10000;         // przerwa miedzy dialogami
 const REPLY_DELAY_MS = 3500;    // odstep miedzy kwestiami w duecie
-const SPLASH_TIMEOUT_MS = 8000; // bezpiecznik, gdyby obrazek nie doszedl
+const SPLASH_MIN_MS = 5500;      // tyle splash wisi, nawet gdy wszystko gotowe
+const SPLASH_TIMEOUT_MS = 12000; // bezpiecznik, gdyby obrazek nie doszedl
+
+// Kazda litera napisu powitalnego bierze kolejny kroj i kolor z tych list.
+const SPLASH_FONTS = [
+    "Impact, fantasy",
+    "Georgia, serif",
+    '"Comic Sans MS", cursive',
+    '"Courier New", monospace',
+    '"Trebuchet MS", sans-serif',
+    '"Times New Roman", serif',
+    "cursive",
+    '"Arial Black", sans-serif'
+];
+
+const SPLASH_COLORS = ["#ffd93b", "#ff5f6d", "#7dff8a", "#5bc0eb", "#ffffff", "#ff9de2"];
+const SPLASH_HEARTS = ["❤️", "💕", "💖", "💗", "💘"];
 const URGENT_FROM_MS = 3600000; // ostatnia godzina - licznik sie niecierpliwi
 const FINAL_FROM_MS = 60000;    // ostatnia minuta - odliczanie na pelny ekran
 const NERD_CLICKS = 5;          // tyle klikniec w Johnnyego wlacza tryb nerda
@@ -784,6 +800,48 @@ function preloadImage(url) {
     });
 }
 
+// Napis skladamy z pojedynczych liter, kazda innym krojem i kolorem.
+function buildSplashTitle() {
+    const title = el("splash-title");
+    title.setAttribute("aria-label", SPLASH_TITLE);
+
+    [...SPLASH_TITLE].forEach((sign, i) => {
+        const letter = document.createElement("span");
+
+        if (sign === " ") {
+            letter.className = "splash__letter splash__letter--space";
+            title.appendChild(letter);
+            return;
+        }
+
+        letter.className = "splash__letter";
+        letter.textContent = sign;
+        letter.style.fontFamily = SPLASH_FONTS[i % SPLASH_FONTS.length];
+        letter.style.color = SPLASH_COLORS[i % SPLASH_COLORS.length];
+        letter.style.fontSize = `clamp(1.6rem, ${7 + randomInt(4)}vw, ${3.2 + Math.random()}rem)`;
+        letter.style.setProperty("--tilt", `${(Math.random() - 0.5) * 16}deg`);
+        letter.style.animationDelay = `${i * 0.08}s`;
+
+        title.appendChild(letter);
+    });
+}
+
+function buildSplashHearts() {
+    const box = el("splash-hearts");
+
+    for (let i = 0; i < 14; i++) {
+        const heart = document.createElement("span");
+        heart.className = "splash__heart";
+        heart.textContent = SPLASH_HEARTS[randomInt(SPLASH_HEARTS.length)];
+        heart.style.left = `${Math.random() * 96}%`;
+        heart.style.fontSize = `${14 + randomInt(22)}px`;
+        heart.style.animationDuration = `${5 + Math.random() * 5}s`;
+        heart.style.animationDelay = `${Math.random() * 5}s`;
+        heart.style.setProperty("--spin", `${(Math.random() - 0.5) * 120}deg`);
+        box.appendChild(heart);
+    }
+}
+
 function revealScene() {
     if (sceneStarted) return;
     sceneStarted = true;
@@ -793,9 +851,16 @@ function revealScene() {
 
     splash.classList.add("is-hidden");
     splash.addEventListener("transitionend", () => splash.remove(), { once: true });
+
+    // transitionend nie przychodzi, gdy karta jest w tle albo przejscia sa
+    // wylaczone w systemie - splash zostalby wtedy w drzewie na zawsze
+    setTimeout(() => splash.remove(), 1200);
 }
 
-const assets = [preloadImage("pic/background.webp")];
+buildSplashTitle();
+buildSplashHearts();
+
+const assets = [preloadImage("pic/background.webp"), preloadImage("pic/splash.webp")];
 document.querySelectorAll(".char__img").forEach((img) => {
     if (!img.complete) assets.push(preloadImage(img.src));
 });
@@ -805,7 +870,46 @@ document.querySelectorAll(".char__img").forEach((img) => {
 // w chwili podmiany.
 preloadImage(JOHNY_BAZOOKA_SPRITE);
 
-Promise.all(assets).then(revealScene);
+// Splash wisi az do spelnienia obu warunkow: obrazki gotowe i minimalny czas
+// minal. Samo czekanie na obrazki trwaloby ulamek sekundy, a ekran powitalny
+// ma byc widoczny.
+let assetsReady = false;
+let minTimeReached = false;
+const splashStart = Date.now();
+
+function tryReveal() {
+    if (assetsReady && minTimeReached) revealScene();
+}
+
+// Pasek chodzi na timerze, a nie na requestAnimationFrame. rAF jest
+// wstrzymywany, gdy karta nie jest na wierzchu, i pasek zamarzalby w miejscu
+// zamiast po cichu dobiec do konca. Dziesiec odswiezen na sekunde w zupelnosci
+// wystarcza, bo szerokosc i tak jest animowana przez CSS.
+let splashTimer = null;
+
+function renderSplashProgress() {
+    const byTime = (Date.now() - splashStart) / SPLASH_MIN_MS;
+
+    // dopoki obrazki nie sa gotowe, pasek zatrzymuje sie tuz przed koncem,
+    // zeby nie oglaszal gotowosci, ktorej nie ma
+    const value = assetsReady ? Math.min(1, byTime) : Math.min(0.97, byTime);
+    el("splash-fill").style.width = `${(value * 100).toFixed(1)}%`;
+
+    if (sceneStarted) clearInterval(splashTimer);
+}
+
+Promise.all(assets).then(() => {
+    assetsReady = true;
+    tryReveal();
+});
+
+setTimeout(() => {
+    minTimeReached = true;
+    tryReveal();
+}, SPLASH_MIN_MS);
+
+renderSplashProgress();
+splashTimer = setInterval(renderSplashProgress, 100);
 
 // bezpiecznik: gdyby ktorys obrazek nie chcial dojsc, sceny i tak nie blokujemy
 setTimeout(revealScene, SPLASH_TIMEOUT_MS);
