@@ -141,6 +141,25 @@ to trzy rzeczy i każda ma swoje lekarstwo:
 Splash ma bezpiecznik `SPLASH_TIMEOUT_MS` (8 s) — gdyby któryś obrazek nie
 doszedł, scena i tak się pokaże.
 
+### Numer wersji przy plikach
+
+GitHub Pages serwuje wszystko z nagłówkiem `Cache-Control: max-age=600`.
+Oznacza to, że po wejściu na świeży `index.html` przeglądarka przez dziesięć
+minut i tak podaje **stary** `style.css` i stare skrypty — dopisanie `?v=2`
+do adresu strony tego nie łamie, bo odświeża tylko sam dokument. Efektem był
+nowy układ z częścią starej logiki.
+
+Dlatego odwołania w `index.html` mają numer:
+
+```html
+<link rel="stylesheet" href="style.css?v=2">
+<script src="lines.js?v=2"></script>
+```
+
+**Po każdej zmianie `style.css`, `lines.js`, `script.js` lub `game.js` trzeba
+podbić ten numer we wszystkich czterech linijkach.** Bez tego zmiana dojdzie
+do użytkownika dopiero po dziesięciu minutach.
+
 Regenerowanie WebP (wymaga Pillow, `pip install pillow`):
 
 ```bash

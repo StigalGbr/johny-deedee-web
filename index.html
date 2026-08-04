@@ -9,7 +9,13 @@
     <!-- tlo siedzi w CSS, wiec bez tego przegladarka bierze sie za nie dopiero
          po sparsowaniu arkusza - przy pierwszym wejsciu bylo widac biale tlo -->
     <link rel="preload" as="image" href="pic/background.webp">
-    <link rel="stylesheet" href="style.css">
+
+    <!-- GitHub Pages serwuje wszystko z max-age=600, wiec przegladarka trzyma
+         stary arkusz i stare skrypty jeszcze przez dziesiec minut po wejsciu
+         na swiezy index.html. Numer w adresie to lamie.
+         PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
+         podbij ten numer we wszystkich czterech linijkach. -->
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -111,8 +117,8 @@
         <span class="final-count__label">sekund</span>
     </div>
 
-    <script src="lines.js"></script>
-    <script src="script.js"></script>
-    <script src="game.js"></script>
+    <script src="lines.js?v=2"></script>
+    <script src="script.js?v=2"></script>
+    <script src="game.js?v=2"></script>
 </body>
 </html>
