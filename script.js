@@ -19,6 +19,7 @@ const NERD_DURATION_MS = 25000;
 const SHAKE_THRESHOLD = 22;
 
 const CONFETTI_COLORS = ["#ffd93b", "#ff5f6d", "#7dff8a", "#5bc0eb", "#ffffff", "#a24f24"];
+const GORE_COLORS = ["#8f0f12", "#b81c1c", "#6a0a10", "#d63131", "#4a0709"];
 
 const el = (id) => document.getElementById(id);
 
@@ -303,30 +304,143 @@ function dropGlasses(rect) {
     };
 }
 
-// Tarantula przebiega przez ekran, Dee Dee reaguje
+// Tarantula rusza w strone Dee Dee, ale w polowie drogi dostaje z bazooki.
+// Sekwencja: marsz -> Johnny sie sklada -> rakieta -> pajak peka -> podziekowania.
+const SPIDER_WALK_MS = 1500;
+const ROCKET_MS = 320;
+
+let spiderBusy = false;
+
 function releaseSpider() {
+    if (spiderBusy || finaleStarted) return;
+    spiderBusy = true;
+
     const size = Math.min(170, Math.max(80, Math.round(window.innerWidth * 0.11)));
-    const item = spawnFx("🕷️");
-    item.style.fontSize = size + "px";
+    const spider = spawnFx("🕷️");
+    spider.style.fontSize = size + "px";
 
-    const y = window.innerHeight * (0.35 + Math.random() * 0.3);
-    const start = -size - 20;
-    const end = window.innerWidth + size;
+    const y = window.innerHeight * (0.42 + Math.random() * 0.16);
+    const midX = window.innerWidth * 0.5;
 
-    animateFx(item, [
-        { transform: `translate(${start}px, ${y}px) rotate(-8deg)` },
-        { transform: `translate(${window.innerWidth * 0.25}px, ${y - 26}px) rotate(10deg)`, offset: 0.25 },
-        { transform: `translate(${window.innerWidth * 0.5}px, ${y + 18}px) rotate(-10deg)`, offset: 0.5 },
-        { transform: `translate(${window.innerWidth * 0.75}px, ${y - 22}px) rotate(8deg)`, offset: 0.75 },
-        { transform: `translate(${end}px, ${y}px) rotate(-6deg)` }
-    ], { duration: 2600, easing: "linear" });
+    spider.animate([
+        { transform: `translate(${-size - 20}px, ${y}px) rotate(-8deg)` },
+        { transform: `translate(${window.innerWidth * 0.18}px, ${y - 22}px) rotate(9deg)`, offset: 0.35 },
+        { transform: `translate(${window.innerWidth * 0.34}px, ${y + 16}px) rotate(-9deg)`, offset: 0.7 },
+        { transform: `translate(${midX}px, ${y}px) rotate(0deg)` }
+    ], { duration: SPIDER_WALK_MS, easing: "linear", fill: "forwards" });
 
-    if (finaleStarted) return;
     clearDialogTimers();
+    showBubble("deedee", REACTIONS.spider);
+
+    // Kolejne fazy chodza na setTimeout, a nie na onfinish animacji. Animacje
+    // sa wstrzymywane w karcie w tle - sekwencja zatrzymalaby sie w polowie,
+    // zostawiajac pajaka na ekranie i blokade na kolejne wywolania.
     setTimeout(() => {
-        showBubble("deedee", REACTIONS.spider);
+        showBubble("johny", REACTIONS.heroAim);
+        aimBazooka();
+    }, SPIDER_WALK_MS);
+
+    setTimeout(() => fireRocket(spider, midX + size * 0.35, y + size * 0.4), SPIDER_WALK_MS + 480);
+}
+
+// Johnny zamienia sie w wersje z bazooka i po chwili wraca do siebie.
+// Oba sprite'y maja ten sam kadr i te sama wielkosc postaci, wiec podmiana
+// nie przesuwa go ani o piksel - to jest zrobione w align.py przy konwersji.
+const JOHNY_SPRITE = "pic/johny-bravo.webp";
+const JOHNY_BAZOOKA_SPRITE = "pic/johny-bazooka.webp";
+
+// wylot lufy w ulamkach kadru sprite'a z bazooka
+const MUZZLE_X = 0.983;
+const MUZZLE_Y = 0.114;
+
+function johnyImg() {
+    return document.querySelector(".char--johny .char__img");
+}
+
+function aimBazooka() {
+    const img = johnyImg();
+    img.src = JOHNY_BAZOOKA_SPRITE;
+    img.classList.add("is-armed");
+
+    setTimeout(() => {
+        img.src = JOHNY_SPRITE;
+        img.classList.remove("is-armed");
+    }, 2200);
+}
+
+function fireRocket(spider, targetX, targetY) {
+    const img = johnyImg();
+    const rect = img.getBoundingClientRect();
+    const fromX = rect.left + rect.width * MUZZLE_X;
+    const fromY = rect.top + rect.height * MUZZLE_Y;
+
+    img.classList.add("is-firing");
+    setTimeout(() => img.classList.remove("is-firing"), 220);
+
+    const rocket = spawnFx("", "fx__rocket");
+    animateFx(rocket, [
+        { transform: `translate(${fromX}px, ${fromY}px) scale(0.6)` },
+        { transform: `translate(${targetX}px, ${targetY}px) scale(1)` }
+    ], { duration: ROCKET_MS, easing: "cubic-bezier(.3,0,.9,1)" });
+
+    setTimeout(() => splatterSpider(spider, targetX, targetY), ROCKET_MS);
+}
+
+// Quake-owy zgon: rozbryzg, ochlapy na ekranie i wstrzas
+function splatterSpider(spider, x, y) {
+    spider.getAnimations().forEach((a) => a.cancel());
+    spider.remove();
+
+    fireConfetti(70, x, y, GORE_COLORS, true);
+
+    for (let i = 0; i < 9; i++) {
+        const splat = spawnFx("", "fx__splat");
+        const size = 30 + randomInt(70);
+        const sx = x + (Math.random() - 0.5) * 340;
+        const sy = y + (Math.random() - 0.5) * 260;
+
+        splat.style.width = size + "px";
+        splat.style.height = size * (0.6 + Math.random() * 0.5) + "px";
+
+        animateFx(splat, [
+            { transform: `translate(${sx}px, ${sy}px) scale(0.2)`, opacity: 0 },
+            { transform: `translate(${sx}px, ${sy}px) scale(1)`, opacity: 0.9, offset: 0.12 },
+            { transform: `translate(${sx}px, ${sy + 26}px) scale(1)`, opacity: 0 }
+        ], { duration: 2400, delay: randomInt(120) });
+    }
+
+    document.querySelector(".scene").classList.add("is-shaking");
+    setTimeout(() => document.querySelector(".scene").classList.remove("is-shaking"), 420);
+
+    setTimeout(() => {
+        showBubble("deedee", REACTIONS.hero);
+        cheerDeeDee();
+        spiderBusy = false;
         scheduleNextDialog();
-    }, 700);
+    }, 500);
+}
+
+// Namiastka zadowolonej Dee Dee: podskok i serduszka.
+// Docelowo do podmiany na osobny render postaci, jesli sie pojawi.
+function cheerDeeDee() {
+    const img = document.querySelector(".char--deedee .char__img");
+    const rect = img.getBoundingClientRect();
+
+    img.classList.add("is-cheering");
+    setTimeout(() => img.classList.remove("is-cheering"), 1400);
+
+    for (let i = 0; i < 8; i++) {
+        const heart = spawnFx(["❤️", "💖", "😍"][randomInt(3)]);
+        heart.style.fontSize = 20 + randomInt(20) + "px";
+
+        const hx = rect.left + rect.width * (0.2 + Math.random() * 0.6);
+        const hy = rect.top + rect.height * 0.2;
+
+        animateFx(heart, [
+            { transform: `translate(${hx}px, ${hy}px) scale(0.4)`, opacity: 0 },
+            { transform: `translate(${hx + (Math.random() - 0.5) * 60}px, ${hy - 140}px) scale(1)`, opacity: 1 }
+        ], { duration: 1400, delay: randomInt(400), easing: "ease-out" });
+    }
 }
 
 // ============================================================
@@ -345,21 +459,28 @@ function sizeConfetti() {
     confettiCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 }
 
-function fireConfetti(count = 90, originX = window.innerWidth / 2, originY = window.innerHeight * 0.62) {
+// gib = tryb miesny: ciezsze, grubsze kawalki lecace na wszystkie strony,
+// zamiast lekkich papierkow wystrzelonych do gory
+function fireConfetti(count = 90, originX = window.innerWidth / 2, originY = window.innerHeight * 0.62,
+    colors = CONFETTI_COLORS, gib = false) {
+
     for (let i = 0; i < count; i++) {
-        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.7;
-        const speed = 7 + Math.random() * 9;
+        const angle = gib
+            ? Math.random() * Math.PI * 2
+            : -Math.PI / 2 + (Math.random() - 0.5) * 1.7;
+        const speed = gib ? 3 + Math.random() * 13 : 7 + Math.random() * 9;
 
         confettiPieces.push({
             x: originX,
             y: originY,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
-            w: 6 + Math.random() * 6,
-            h: 9 + Math.random() * 8,
+            w: gib ? 5 + Math.random() * 14 : 6 + Math.random() * 6,
+            h: gib ? 5 + Math.random() * 14 : 9 + Math.random() * 8,
             rot: Math.random() * Math.PI,
-            vr: (Math.random() - 0.5) * 0.35,
-            color: CONFETTI_COLORS[randomInt(CONFETTI_COLORS.length)]
+            vr: (Math.random() - 0.5) * (gib ? 0.6 : 0.35),
+            color: colors[randomInt(colors.length)],
+            gib
         });
     }
 
@@ -370,8 +491,8 @@ function stepConfetti() {
     confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     confettiPieces = confettiPieces.filter((p) => {
-        p.vy += 0.22;
-        p.vx *= 0.995;
+        p.vy += p.gib ? 0.42 : 0.22;
+        p.vx *= p.gib ? 0.985 : 0.995;
         p.x += p.vx;
         p.y += p.vy;
         p.rot += p.vr;
@@ -631,6 +752,11 @@ const assets = [preloadImage("pic/background.webp")];
 document.querySelectorAll(".char__img").forEach((img) => {
     if (!img.complete) assets.push(preloadImage(img.src));
 });
+
+// Sprite z bazooka sciagamy w tle. Bez tego pierwsze siegniecie po nia
+// pokazywaloby pusta sylwetke, bo obrazek zaczalby sie ladowac dopiero
+// w chwili podmiany.
+preloadImage(JOHNY_BAZOOKA_SPRITE);
 
 Promise.all(assets).then(revealScene);
 

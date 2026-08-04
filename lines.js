@@ -88,7 +88,18 @@ const FINALE_LINE = "No to lecimy! 💃🍦";
 // Reakcje na akcje uzytkownika.
 const REACTIONS = {
     spider: "NIE. NIE. NIE. Zabierz to 🕷️",
+    heroAim: "Nie ruszaj się. Mam to pod kontrolą 🚀",
+    hero: "Mój bohater 😍",
     nerdModeOn: "Wchodzę w tryb nerda 🟩 Od teraz mówię binarnie."
+};
+
+// Teksty w trybie gry.
+const GAME_TEXTS = {
+    title: "Badminton",
+    hint: "Myszką albo palcem: góra ekranu — rakietka w górę, dół — w dół",
+    winJohny: "Johnny wygrywa! Zaraz wyjaśni, że to była kwestia optymalizacji 🏸",
+    winDeedee: "Dee Dee wygrywa! Idziemy na lody 🍦",
+    toWin: 5
 };
 
 // Tryb nerda: te zdania sa zamieniane na kod binarny w locie.

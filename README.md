@@ -11,13 +11,49 @@ postać, kliknięcie obok albo `Esc` chowa dymek — kolejka wraca po 10 sekunda
 
 ```
 index.html           struktura strony
-style.css            layout, tło, dymki, splash, efekty, wersja mobilna
+style.css            layout, tło, dymki, splash, efekty, gra, wersja mobilna
 lines.js             wszystkie teksty — dialogi, plan wieczoru, reakcje
-script.js            cała logika
+script.js            logika sceny: licznik, dialogi, efekty, bazooka
+game.js              badminton
 pic/
   *.webp             pliki używane przez stronę
   *.png              oryginały (nieużywane przez stronę, trzymane jako źródło)
 ```
+
+### Sprite'y postaci
+
+| plik | gdzie używany |
+|---|---|
+| `johny-bravo.webp`, `dee-dee.webp` | scena |
+| `johny-bazooka.webp` | podmieniany w scenie na czas strzału |
+| `johny-racket-up/down.webp` | gra |
+| `dee-dee-racket-up/down.webp` | gra |
+
+Wszystkie sprite'y jednej postaci mają **ten sam kadr, tę samą wielkość
+postaci i tę samą linię stóp**. To warunek konieczny: bez tego Johnny
+podskakiwałby w chwili sięgania po bazookę, a w grze skakałaby cała sylwetka
+zamiast samej ręki z rakietką.
+
+Materiał źródłowy tego nie miał — każdy obrazek był generowany osobno, więc
+postacie różniły się wielkością nawet o 20% i stały w innym miejscu kadru.
+Zgranie robi `align.py` (w katalogu roboczym, nie w repo):
+
+* **wielkość** — pole sylwetki, bo rośnie z kwadratem skali. Rakietka to
+  cienki obrys i wnosi kilka procent, więc dla par góra/dół jest dość dokładne.
+  Przy bazooce ta miara kłamie, bo broń jest duża i lita — tam skala jest
+  dobrana okiem (1,08; powyżej ucina się wylot lufy).
+* **pion** — dolna krawędź sylwetki, żeby stopy stały na tej samej linii.
+* **poziom** — mediana pikseli dolnej partii sylwetki. Środek liczony ze
+  skrajnych punktów nie działa, bo opuszczona rakietka wystaje w bok
+  i przeciąga kotwicę, przez co tułów skakał na boki.
+
+Sprite z bazooką jest dodatkowo **odbity w poziomie** — w oryginale lufa
+celuje w lewo, a Johnny stoi po lewej stronie i strzela w prawo, w stronę
+Dee Dee.
+
+Radość Dee Dee jest nadal udawana podskokiem i serduszkami — nie ma dla niej
+osobnego renderu. Gdyby się pojawił, wystarczy przełączyć `src` w
+`cheerDeeDee()`.
 
 Zero zależności, zero builda — czysty HTML/CSS/JS. Teksty są odcięte od
 logiki: żeby zmienić co postacie mówią, wystarczy `lines.js`.
@@ -33,10 +69,25 @@ kwestię.
 Johnny'ego zrzuca mu okulary na ziemię (wracają po 3 sekundach). Kliknięcie w
 licznik strzela konfetti.
 
-**Pająk.** Potrząśnięcie telefonem przepuszcza pająka przez ekran, a Dee Dee
-reaguje. iOS wymaga zgody na czujnik ruchu i to koniecznie z poziomu gestu,
+**Pająk i bazooka.** Potrząśnięcie telefonem wypuszcza tarantulę, która rusza
+w stronę Dee Dee. W połowie drogi Johnny wyciąga bazookę, strzela, pająk pęka
+w rozbryzgu w stylu starych strzelanek, ekranem szarpie, a Dee Dee dziękuje
+bohaterowi. iOS wymaga zgody na czujnik ruchu i to koniecznie z poziomu gestu,
 dlatego pyta o nią przycisk `🕷️ Obudź pająka` w planie wieczoru — ten sam
-przycisk wypuszcza pająka na komputerze.
+przycisk odpala całą sekwencję na komputerze.
+
+Kolejne fazy tej sekwencji chodzą na `setTimeout`, a nie na `onfinish`
+animacji. Animacje są wstrzymywane w karcie w tle i sekwencja zatrzymałaby się
+w połowie, zostawiając pająka na ekranie i blokadę na kolejne wywołania.
+
+**Badminton.** Przycisk `🏸` w prawym górnym rogu otwiera grę: pong z
+postaciami, gdzie rakietka ma tylko dwa stany — góra albo dół. Myszą, palcem
+albo strzałkami wybierasz połowę, w której chcesz odebrać. Animacja to dwa
+sprite'y na postać, przełączane w miejscu. Pasek przy krawędzi pokazuje
+zasięg odbicia, bo sam sprite nie mówi dokładnie, gdzie kończy się rakietka.
+Dee Dee gra jako przeciwnik i myli się w 14% przypadków, więc da się z nią
+wygrać i przegrać. Do pięciu punktów. Cała gra siedzi w [`game.js`](game.js),
+a jej stałe (prędkość, zasięg rakietki, poziom trudności) są na górze pliku.
 
 **Tryb nerda.** Pięć kliknięć w Johnny'ego pod rząd zmienia tło w zielony
 deszcz zer i jedynek, a jego kwestie w kod binarny. Wyłącza się sam po 25

@@ -39,6 +39,7 @@
                     <img class="char__img" src="pic/johny-bravo.webp" alt="Johnny Bravo" width="1024" height="1521"
                         fetchpriority="high">
                 </button>
+
             </div>
 
             <div class="bubble bubble--finale" id="bubble-finale" hidden></div>
@@ -63,6 +64,33 @@
         📋<span class="plan-toggle__label">Plan wieczoru</span>
     </button>
 
+    <!-- tryb gry -->
+    <button class="game-toggle" id="game-toggle" type="button" aria-label="Zagraj w badmintona">
+        🏸<span class="game-toggle__label">Badminton</span>
+    </button>
+
+    <div class="game" id="game" hidden>
+        <div class="game__bar">
+            <span class="game__score">
+                <b>Johnny</b>
+                <span class="game__points" id="game-score-johny">0</span>
+                :
+                <span class="game__points" id="game-score-deedee">0</span>
+                <b>Dee Dee</b>
+            </span>
+            <button class="game__close" id="game-close" type="button" aria-label="Zamknij grę">✕</button>
+        </div>
+
+        <canvas class="game__canvas" id="game-canvas"></canvas>
+
+        <p class="game__hint" id="game-hint"></p>
+
+        <div class="game__over" id="game-over" hidden>
+            <p class="game__over-text" id="game-over-text"></p>
+            <button class="game__again" id="game-again" type="button">Jeszcze raz</button>
+        </div>
+    </div>
+
     <aside class="plan" id="plan" hidden>
         <h2 class="plan__title">Plan wieczoru</h2>
         <ol class="plan__list" id="plan-list"></ol>
@@ -83,5 +111,6 @@
 
     <script src="lines.js"></script>
     <script src="script.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
