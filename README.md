@@ -80,7 +80,7 @@ Kolejne fazy tej sekwencji chodzą na `setTimeout`, a nie na `onfinish`
 animacji. Animacje są wstrzymywane w karcie w tle i sekwencja zatrzymałaby się
 w połowie, zostawiając pająka na ekranie i blokadę na kolejne wywołania.
 
-**Gry.** Przycisk `🏸` w prawym górnym rogu otwiera planszę z wyborem dwóch
+**Gry.** Przycisk `🎮` w prawym górnym rogu otwiera planszę z wyborem dwóch
 trybów. Oba siedzą w [`game.js`](game.js), w obiektach `MODES` — wspólna jest
 tylko obsługa płótna, pętli i menu, a każdy tryb ma własne stałe na górze
 swojej sekcji.

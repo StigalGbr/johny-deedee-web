@@ -107,9 +107,11 @@
             serve(Math.random() < 0.5);
         }
 
+        // kolejnosc na pasku musi zgadzac sie ze stronami planszy:
+        // Johnny gra po lewej, Dee Dee po prawej
         function score() {
-            return `<b>Ty (Dee Dee)</b><span class="game__points">${state.score.player}</span>`
-                + `:<span class="game__points">${state.score.cpu}</span><b>Johnny</b>`;
+            return `<b>Johnny</b><span class="game__points">${state.score.cpu}</span>`
+                + `:<span class="game__points">${state.score.player}</span><b>Ty (Dee Dee)</b>`;
         }
 
         function point(who) {
