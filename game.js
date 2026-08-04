@@ -8,13 +8,17 @@
     const PADDLE_H = 0.44;
     const PADDLE_UP = 0.27;        // srodek rakietki w gornym stanie
     const PADDLE_DOWN = 0.73;
-    const PADDLE_X = 0.13;
+    const PADDLE_X_MIN = 0.12;
+    const PADDLE_X_MAX = 0.3;
     const BALL_R = 0.018;
     const START_SPEED = 0.011;
     const SPEED_STEP = 0.0006;
     const MAX_SPEED = 0.024;
     const CPU_MISTAKE = 0.14;      // szansa, ze Dee Dee wybierze zla polowe
-    const CHAR_HEIGHT = 0.98;      // wysokosc postaci wzgledem pola
+    // Wysokosc kadru sprite'a wzgledem pola. Sam kadr jest wyzszy niz postac,
+    // bo mieszcza sie w nim uniesione rakietki, wiec sylwetka zajmuje mniej
+    // niz ta wartosc.
+    const CHAR_HEIGHT = 0.8;
 
     const gameEl = document.getElementById("game");
     const canvas = document.getElementById("game-canvas");
@@ -45,6 +49,11 @@
     let W = 0;
     let H = 0;
 
+    // Linia odbicia. Liczona z szerokosci postaci, zeby wypadala przy jej
+    // rakietce, a nie w poprzek tulowia - przy stalej wartosci pasek zasiegu
+    // lezal na brzuchu.
+    let paddleX = PADDLE_X_MIN;
+
     const state = {
         ball: { x: 0.5, y: 0.5, vx: START_SPEED, vy: 0.004 },
         johny: { up: true, hit: 0 },
@@ -72,6 +81,11 @@
 
         W = cssWidth;
         H = cssHeight;
+
+        const sprite = sprites.johny.down;
+        const aspect = sprite.naturalWidth ? sprite.naturalWidth / sprite.naturalHeight : 0.55;
+        const charWidth = H * CHAR_HEIGHT * aspect;
+        paddleX = Math.min(PADDLE_X_MAX, Math.max(PADDLE_X_MIN, charWidth / W));
     }
 
     // ---------- rozgrywka ----------
@@ -152,18 +166,18 @@
             state.deedee.up = Math.random() < CPU_MISTAKE ? !shouldBeUp : shouldBeUp;
         }
 
-        if (ball.vx < 0 && ball.x - BALL_R <= PADDLE_X) {
+        if (ball.vx < 0 && ball.x - BALL_R <= paddleX) {
             if (paddleCovers(state.johny, ball.y)) {
-                ball.x = PADDLE_X + BALL_R;
+                ball.x = paddleX + BALL_R;
                 bounce(state.johny, ball.y);
             } else if (ball.x < -0.05) {
                 point("deedee");
             }
         }
 
-        if (ball.vx > 0 && ball.x + BALL_R >= 1 - PADDLE_X) {
+        if (ball.vx > 0 && ball.x + BALL_R >= 1 - paddleX) {
             if (paddleCovers(state.deedee, ball.y)) {
-                ball.x = 1 - PADDLE_X - BALL_R;
+                ball.x = 1 - paddleX - BALL_R;
                 bounce(state.deedee, ball.y);
             } else if (ball.x > 1.05) {
                 point("johny");
@@ -190,7 +204,18 @@
         // krotkie szarpniecie po odbiciu, w strone od ktorej przyszla pilka
         ctx.save();
         ctx.translate(player.hit * 10 * (side === "left" ? -1 : 1), 0);
-        ctx.drawImage(sprite, x, H - h, w, h);
+
+        // Obie postacie zostaly narysowane zwrocone w lewo. Dee Dee gra po
+        // prawej stronie, wiec patrzy na siatke i jest w porzadku, ale Johnny
+        // stalby do niej tylem - jego odbijamy.
+        if (side === "left") {
+            ctx.translate(x + w, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(sprite, 0, H - h, w, h);
+        } else {
+            ctx.drawImage(sprite, x, H - h, w, h);
+        }
+
         ctx.restore();
     }
 
@@ -200,7 +225,7 @@
     function drawZone(player, side) {
         const pw = W * PADDLE_W;
         const ph = H * PADDLE_H;
-        const x = side === "left" ? W * PADDLE_X - pw : W * (1 - PADDLE_X);
+        const x = side === "left" ? W * paddleX - pw : W * (1 - paddleX);
         const cy = H * (player.up ? PADDLE_UP : PADDLE_DOWN);
 
         ctx.save();
