@@ -27,7 +27,7 @@ body {
 .splash {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 60;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -93,12 +93,12 @@ body {
     z-index: 3;
     text-align: center;
     padding: 4vh 1rem 0;
-    pointer-events: none;
 }
 
 .countdown {
     display: inline-block;
     padding: 0.6rem 1.4rem;
+    font: inherit;
     font-size: clamp(1rem, 3vw, 2rem);
     font-weight: 700;
     color: #fff;
@@ -108,11 +108,46 @@ body {
     backdrop-filter: blur(4px);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.countdown:hover,
+.countdown:focus-visible {
+    transform: scale(1.04);
+    border-color: #ffd93b;
+    outline: none;
+}
+
+.countdown:active {
+    transform: scale(0.97);
+}
+
+/* ostatnia godzina - licznik zaczyna sie niecierpliwic */
+.countdown.is-urgent {
+    color: #ffd93b;
+    border-color: #ffd93b;
+    animation: countdown-pulse 1s ease-in-out infinite;
 }
 
 .countdown.is-finished {
     background: rgba(200, 30, 30, 0.75);
     border-color: #ffd93b;
+    animation: none;
+}
+
+@keyframes countdown-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 217, 59, 0.5);
+    }
+
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 12px rgba(255, 217, 59, 0);
+    }
 }
 
 /* ---------- postacie ---------- */
@@ -162,6 +197,24 @@ body {
     filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
     user-select: none;
     -webkit-user-drag: none;
+    animation: breathe 5s ease-in-out infinite;
+}
+
+.char--deedee .char__img {
+    animation-delay: -2.5s;
+}
+
+/* delikatne oddychanie, zeby scena nie byla martwym obrazkiem */
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
 }
 
 /* ---------- dymki ---------- */
@@ -197,7 +250,7 @@ body {
     right: 30%;
 }
 
-/* ogonek dymka: warstwa obrysu + warstwa wypełnienia */
+/* ogonek dymka: warstwa obrysu + warstwa wypelnienia */
 .bubble::before,
 .bubble::after {
     content: "";
@@ -232,6 +285,24 @@ body {
     border-color: #fff transparent transparent transparent;
 }
 
+/* wspolny dymek finalowy - jeden na dwoje, na srodku sceny */
+.bubble--finale {
+    position: absolute;
+    left: 50%;
+    bottom: 62%;
+    transform: translateX(-50%);
+    max-width: min(30ch, 70vw);
+    text-align: center;
+    font-size: clamp(1.1rem, 2.4vw, 2rem);
+    background: #ffd93b;
+    z-index: 6;
+}
+
+.bubble--finale::before,
+.bubble--finale::after {
+    display: none;
+}
+
 @keyframes bubble-pop {
     from {
         opacity: 0;
@@ -241,6 +312,236 @@ body {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+/* dymek finalowy ma wlasny transform, wiec i wlasne wejscie */
+.bubble--finale {
+    animation: finale-pop 0.35s ease-out;
+}
+
+@keyframes finale-pop {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+/* ---------- final: postacie schodza sie na srodek ---------- */
+
+.stage.is-finale {
+    justify-content: center;
+    gap: 0;
+}
+
+.stage.is-finale .char {
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- plan wieczoru ---------- */
+
+.plan-toggle {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9;
+    padding: 0.5rem 0.9rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(20, 20, 30, 0.62);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.plan-toggle__label {
+    margin-left: 0.4rem;
+}
+
+.plan-toggle:hover,
+.plan-toggle:focus-visible {
+    border-color: #ffd93b;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.plan {
+    position: fixed;
+    top: 58px;
+    left: 12px;
+    z-index: 9;
+    width: min(320px, calc(100vw - 24px));
+    padding: 1.1rem 1.3rem 1rem;
+    color: #16161d;
+    background: #fff;
+    border: 3px solid #16161d;
+    border-radius: 22px;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4);
+    animation: bubble-pop 0.22s ease-out;
+}
+
+.plan[hidden] {
+    display: none;
+}
+
+.plan__title {
+    font-size: 1.05rem;
+    margin-bottom: 0.7rem;
+}
+
+.plan__list {
+    list-style: none;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.plan__list li {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.2rem 0;
+}
+
+.plan__list b {
+    flex: 0 0 3.2rem;
+    color: #a24f24;
+}
+
+.plan__spider {
+    margin-top: 0.9rem;
+    width: 100%;
+    padding: 0.5rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: #16161d;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.plan__spider:hover {
+    background: #a24f24;
+}
+
+.plan__hint {
+    margin-top: 0.45rem;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    text-align: center;
+}
+
+/* ---------- efekty ---------- */
+
+.confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+}
+
+/* warstwa na spadajace lody, okulary i pajaka */
+.fx {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.fx__item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform, opacity;
+}
+
+/* ---------- tryb nerda ---------- */
+
+.matrix {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+body.is-nerd .matrix {
+    opacity: 1;
+}
+
+body.is-nerd .bubble--johny {
+    color: #7dff8a;
+    background: #04180a;
+    border-color: #7dff8a;
+    font-family: "Consolas", "Courier New", monospace;
+    word-break: break-all;
+}
+
+body.is-nerd .bubble--johny::after {
+    border-top-color: #04180a;
+}
+
+body.is-nerd .bubble--johny::before {
+    border-top-color: #7dff8a;
+}
+
+/* ---------- ostatnie 60 sekund ---------- */
+
+.final-count {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    pointer-events: none;
+    background: rgba(10, 6, 10, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+.final-count[hidden] {
+    display: none;
+}
+
+.final-count__number {
+    font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+    font-size: clamp(6rem, 30vw, 20rem);
+    line-height: 1;
+    color: #ffd93b;
+    text-shadow: 0 0 40px rgba(255, 217, 59, 0.55);
+    animation: final-tick 1s ease-out infinite;
+}
+
+.final-count__label {
+    font-size: clamp(1rem, 3vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+@keyframes final-tick {
+    0% {
+        transform: scale(1.25);
+        opacity: 0.4;
+    }
+
+    35% {
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -266,11 +567,6 @@ body {
 @media (max-width: 768px) {
     .hud {
         padding-top: 2vh;
-    }
-
-    .countdown {
-        margin-top: 0.7rem;
-        padding: 0.45rem 1rem;
     }
 
     .stage {
@@ -301,13 +597,36 @@ body {
     .bubble--deedee {
         right: 12%;
     }
+
+    .bubble--finale {
+        max-width: 80vw;
+        bottom: 66%;
+    }
+
+    /* na waskim ekranie zostaje sama ikona - z podpisem przycisk wchodzil
+       na wysrodkowany licznik */
+    .plan-toggle {
+        font-size: 0.95rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .plan-toggle__label {
+        display: none;
+    }
+
+    .plan {
+        top: 50px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
 
     .bubble,
     .char__btn,
-    .splash__dots span {
+    .char__img,
+    .splash__dots span,
+    .countdown,
+    .final-count__number {
         animation: none;
         transition: none;
     }

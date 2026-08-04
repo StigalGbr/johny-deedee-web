@@ -3,27 +3,62 @@
 Prosta statyczna strona: tło, dwie klikalne postacie i licznik odliczający do
 **5 sierpnia 2026, 20:00 czasu polskiego**.
 
-Dymki chodzą same, bez klikania: po wejściu na stronę zawsze odzywa się Johnny
-tekstem o baciacie, a potem co 10 sekund głos przejmuje na przemian druga
-postać — już z losowaniem. Każda ma pulę dziesięciu odzywek i ta sama nie
-wypada dwa razy pod rząd.
-
-Kliknięcie w postać przerywa kolejkę i od razu pokazuje jej nowy tekst
-(odliczanie 10 sekund startuje od nowa). Ponowne kliknięcie w gadającą postać,
-kliknięcie obok albo `Esc` chowa dymek — karuzela wraca po 10 sekundach.
+Postacie gadają same, bez klikania: po wejściu na stronę zawsze leci ten sam
+dialog otwierający, potem losowane są kolejne. Ponowne kliknięcie w gadającą
+postać, kliknięcie obok albo `Esc` chowa dymek — kolejka wraca po 10 sekundach.
 
 ## Zawartość
 
 ```
 index.html           struktura strony
-style.css            layout, tło, dymki, splash, wersja mobilna
-script.js            licznik, teksty dymków, karuzela i kliknięcia
+style.css            layout, tło, dymki, splash, efekty, wersja mobilna
+lines.js             wszystkie teksty — dialogi, plan wieczoru, reakcje
+script.js            cała logika
 pic/
   *.webp             pliki używane przez stronę
   *.png              oryginały (nieużywane przez stronę, trzymane jako źródło)
 ```
 
-Zero zależności, zero builda — czysty HTML/CSS/JS.
+Zero zależności, zero builda — czysty HTML/CSS/JS. Teksty są odcięte od
+logiki: żeby zmienić co postacie mówią, wystarczy `lines.js`.
+
+## Co się dzieje na stronie
+
+**Dialogi.** Postacie prowadzą rozmowy — jedna zagaja, druga odpowiada po 3,5
+sekundy, potem 10 sekund przerwy i losowany jest kolejny dialog. Część wpisów
+to monologi. Kliknięcie w postać przerywa kolejkę i wywołuje od niej losową
+kwestię.
+
+**Efekty.** Kliknięcie w Dee Dee sypie lodami i serduszkami, kliknięcie w
+Johnny'ego zrzuca mu okulary na ziemię (wracają po 3 sekundach). Kliknięcie w
+licznik strzela konfetti.
+
+**Pająk.** Potrząśnięcie telefonem przepuszcza pająka przez ekran, a Dee Dee
+reaguje. iOS wymaga zgody na czujnik ruchu i to koniecznie z poziomu gestu,
+dlatego pyta o nią przycisk `🕷️ Obudź pająka` w planie wieczoru — ten sam
+przycisk wypuszcza pająka na komputerze.
+
+**Tryb nerda.** Pięć kliknięć w Johnny'ego pod rząd zmienia tło w zielony
+deszcz zer i jedynek, a jego kwestie w kod binarny. Wyłącza się sam po 25
+sekundach albo po kolejnych pięciu kliknięciach. Binarne zdania da się
+rozszyfrować — są krótkie i przyjazne.
+
+**Finisz.** W ostatniej godzinie licznik zmienia ton na „Ostatnia prosta!"
+i zaczyna pulsować. W ostatniej minucie wjeżdżają wielkie cyfry na pełny
+ekran. Po dojściu do zera lecą trzy salwy konfetti, postacie zjeżdżają się na
+środek pod wspólnym dymkiem, a licznik zaczyna liczyć w górę: „Randka trwa…".
+
+## Inna data
+
+Bez ruszania kodu, przez adres:
+
+```
+?do=2026-09-12T19:00     konkretna godzina
+?do=2026-09-12           sama data, godzina domyślna 20:00
+```
+
+Bez podanej strefy przyjmowany jest czas polski. Przydaje się też do
+sprawdzenia finału — wystarczy wpisać datę z przeszłości.
 
 ## Ładowanie i wydajność
 
@@ -119,33 +154,52 @@ inny branch = deploy podglądowy pod osobnym URL-em.
 Własna domena: **Project → Settings → Domains → Add**, potem ustawienie
 rekordu CNAME u rejestratora domeny zgodnie z instrukcją, którą pokaże Vercel.
 
-## Zmiana daty odliczania
+## Zmiana daty odliczania na stałe
 
-W [`script.js`](script.js), pierwsza linijka z kodem:
+W [`script.js`](script.js), na górze pliku:
 
 ```js
-const TARGET = new Date("2026-08-05T20:00:00+02:00");
+const DEFAULT_TARGET = "2026-08-05T20:00:00+02:00";
 ```
 
 `+02:00` to czas polski letni (CEST). Zimą (CET) byłoby `+01:00`. Strefa jest
 wpisana na sztywno celowo — dzięki temu każdy widzi to samo odliczanie
-niezależnie od ustawień swojego komputera.
+niezależnie od ustawień swojego komputera. Doraźnie łatwiej użyć parametru
+`?do=` z adresu (patrz wyżej).
 
-## Zmiana tekstów w dymkach
+## Zmiana tekstów
 
-W [`script.js`](script.js), w obiekcie `LINES`:
+Wszystko siedzi w [`lines.js`](lines.js). Dialog to lista kwestii
+w kolejności wypowiadania:
 
 ```js
-const LINES = {
-    "bubble-johny":  [ /* odzywki Johnny'ego */ ],
-    "bubble-deedee": [ /* odzywki Dee Dee */ ]
-};
+const DIALOGS = [
+    [
+        ["johny", "Zagajenie"],
+        ["deedee", "Odpowiedź"]
+    ],
+    [
+        ["deedee", "Monolog, gdy kwestia jest tylko jedna"]
+    ]
+];
 ```
 
-Listy mogą mieć dowolną długość — wystarczy dopisać lub usunąć element tablicy,
-losowanie samo się dostosuje.
+Kolejność w tablicy nie ma znaczenia poza pozycją `OPENING_DIALOG_INDEX` —
+to jest dialog otwierający, pokazywany zaraz po wejściu na stronę. W tym samym
+pliku siedzą też `PLAN` (plan wieczoru), `FINALE_LINE` (wspólny dymek na
+finiszu), `REACTIONS` i `NERD_PHRASES`.
 
-Tekst otwierający (ten pokazywany zaraz po wejściu na stronę) ustawiają
-`OPENING_BUBBLE_ID` i `OPENING_LINE_INDEX` kawałek niżej — domyślnie trzeci
-tekst Johnny'ego. Częstotliwość zmiany dymków to `CYCLE_MS` (domyślnie
-10 000 ms).
+## Pokrętła
+
+Wszystkie na górze [`script.js`](script.js):
+
+| stała | domyślnie | co robi |
+|---|---:|---|
+| `CYCLE_MS` | 10 000 | przerwa między dialogami |
+| `REPLY_DELAY_MS` | 3 500 | odstęp między kwestiami w duecie |
+| `URGENT_FROM_MS` | 3 600 000 | od kiedy licznik pulsuje |
+| `FINAL_FROM_MS` | 60 000 | od kiedy wielkie cyfry na pełny ekran |
+| `NERD_CLICKS` | 5 | kliknięć potrzebnych do trybu nerda |
+| `NERD_DURATION_MS` | 25 000 | jak długo trwa tryb nerda |
+| `SHAKE_THRESHOLD` | 22 | czułość na potrząśnięcie telefonem |
+| `SPLASH_TIMEOUT_MS` | 8 000 | bezpiecznik splasha |
