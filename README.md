@@ -3,8 +3,10 @@
 Prosta statyczna strona: tło, dwie klikalne postacie i licznik odliczający do
 **5 sierpnia 2026, 20:00 czasu polskiego**.
 
-Kliknięcie w postać pokazuje dymek z tekstem (znika po ponownym kliknięciu,
-po kliknięciu obok, klawiszem `Esc` albo automatycznie po 6 sekundach).
+Kliknięcie w postać pokazuje dymek z losowo wybranym tekstem — każda postać ma
+pulę pięciu odzywek i ta sama nie wypada dwa razy pod rząd. Dymek znika po
+ponownym kliknięciu, po kliknięciu obok, klawiszem `Esc` albo automatycznie
+po 6 sekundach.
 
 ## Zawartość
 
@@ -100,5 +102,14 @@ niezależnie od ustawień swojego komputera.
 
 ## Zmiana tekstów w dymkach
 
-Bezpośrednio w [`index.html`](index.html), w elementach
-`#bubble-johny` i `#bubble-deedee`.
+W [`script.js`](script.js), w obiekcie `LINES`:
+
+```js
+const LINES = {
+    "bubble-johny":  [ /* odzywki Johnny'ego */ ],
+    "bubble-deedee": [ /* odzywki Dee Dee */ ]
+};
+```
+
+Listy mogą mieć dowolną długość — wystarczy dopisać lub usunąć element tablicy,
+losowanie samo się dostosuje.
