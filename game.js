@@ -29,6 +29,18 @@
 
     const FIELD_RATIO = 0.58;
 
+    // Predkosci sa podane na klatke przy 60 Hz, a ekrany maja rozna czestotliwosc
+    // - telefon czesto 120 Hz, monitor 60. Kiedys skalowalismy ruch jednym
+    // mnoznikiem dt (ile klatek 60 Hz minelo), ale przy dlugiej, zacietej klatce
+    // na slabszym PC dt bylo obcinane do MAX_DT i gra gubila czas - pajaki i
+    // pilka ledwo sie ruszaly. Teraz zbieramy realny czas i wykonujemy tyle
+    // stalych krokow po 1/60 s, ile go uzbieralo (patrz loop()). Tempo jest
+    // wtedy takie samo przy 30, 60 i 120 Hz, niezaleznie od zaciec, a kazdy krok
+    // to nadal ~1 klatka, wiec badmintonowa pilka nie przeskakuje rakietki.
+    const FRAME_MS = 1000 / 60;
+    const MAX_CATCHUP_MS = 250;  // po powrocie z innej karty nie doganiamy sekund naraz
+    const MAX_STEPS = 20;        // bezpiecznik: nigdy nie zapetlamy sie na updateach
+
     let W = 0;
     let H = 0;
     let raf = null;
@@ -140,11 +152,12 @@
             player.hit = 1;
         }
 
-        function update() {
+        function update(dt) {
             const ball = state.ball;
+            const stepX = ball.vx * dt;
 
-            ball.x += ball.vx;
-            ball.y += ball.vy;
+            ball.x += stepX;
+            ball.y += ball.vy * dt;
 
             if (ball.y < BALL_R) {
                 ball.y = BALL_R;
@@ -156,7 +169,7 @@
             }
 
             // Johnny decyduje, gdy pilka mija polowe boiska w jego strone
-            if (ball.vx < 0 && ball.x < 0.5 && ball.x - ball.vx >= 0.5) {
+            if (ball.vx < 0 && ball.x < 0.5 && ball.x - stepX >= 0.5) {
                 const shouldBeUp = ball.y < 0.5;
                 state.johny.up = Math.random() < CPU_MISTAKE ? !shouldBeUp : shouldBeUp;
             }
@@ -179,8 +192,9 @@
                 }
             }
 
-            state.johny.hit *= 0.88;
-            state.deedee.hit *= 0.88;
+            const fade = Math.pow(0.88, dt);
+            state.johny.hit *= fade;
+            state.deedee.hit *= fade;
         }
 
         function drawZone(player, side) {
@@ -274,7 +288,7 @@
 
         const GORE = ["#8f0f12", "#b81c1c", "#6a0a10", "#d63131"];
 
-        const state = { spiders: [], shots: [], bits: [], kills: 0, lives: T.lives, tick: 0, gap: START_GAP };
+        const state = { spiders: [], shots: [], bits: [], kills: 0, lives: T.lives, odliczanie: 0, gap: START_GAP };
 
         let muzzle = { x: 0, y: 0 };
 
@@ -294,8 +308,7 @@
             state.bits = [];
             state.kills = 0;
             state.lives = T.lives;
-            state.tick = 0;
-            state.gap = START_GAP;
+            state.odliczanie = state.gap = START_GAP;
         }
 
         function score() {
@@ -328,14 +341,18 @@
             }
         }
 
-        function update() {
-            state.tick++;
-
-            if (state.tick % Math.round(state.gap) === 0) spawn();
+        function update(dt) {
+            // odliczanie do nastepnego pajaka - petla, bo przy zacieciu klatki
+            // dt moze przekroczyc caly odstep
+            state.odliczanie -= dt;
+            while (state.odliczanie <= 0) {
+                spawn();
+                state.odliczanie += state.gap;
+            }
 
             state.spiders.forEach((s) => {
-                s.x += s.speed;
-                s.wobble += 0.18;
+                s.x += s.speed * dt;
+                s.wobble += 0.18 * dt;
             });
 
             // pajak, ktory dotarl do Dee Dee, zabiera zycie
@@ -347,17 +364,17 @@
             }
 
             state.shots = state.shots.filter((shot) => {
-                shot.t++;
+                shot.t += dt;
                 if (shot.t < ROCKET_FRAMES) return true;
                 burst(shot.tx, shot.ty);
                 return false;
             });
 
             state.bits = state.bits.filter((b) => {
-                b.vy += 0.35;
-                b.x += b.vx;
-                b.y += b.vy;
-                b.life -= 0.02;
+                b.vy += 0.35 * dt;
+                b.x += b.vx * dt;
+                b.y += b.vy * dt;
+                b.life -= 0.02 * dt;
                 return b.life > 0 && b.y < H + 20;
             });
         }
@@ -470,11 +487,34 @@
         overEl.hidden = false;
     }
 
-    function loop() {
+    let lastFrame = 0;
+    let acc = 0;            // nieprzetworzony czas symulacji w ms
+    let lastScore = "";     // ostatnio wypisany wynik - nie ruszamy DOM co klatke
+
+    function loop(now) {
         if (running) {
-            mode.update();
-            scoreEl.innerHTML = mode.score();
+            // Zacieta klatka (nawet 200-400 ms na slabszym PC) ma zostac
+            // dogoniona krokami. Przycinamy tylko wielkie dziury po powrocie z
+            // innej karty, zeby nie odtwarzac naraz kilku sekund gry.
+            const elapsed = lastFrame ? Math.min(now - lastFrame, MAX_CATCHUP_MS) : FRAME_MS;
+            acc += elapsed;
+
+            let steps = 0;
+            while (acc >= FRAME_MS && steps < MAX_STEPS) {
+                mode.update(1);
+                acc -= FRAME_MS;
+                steps++;
+            }
+            if (steps === MAX_STEPS) acc = 0;  // nie odkladaj zaleglosci bez konca
+
+            const s = mode.score();
+            if (s !== lastScore) {
+                scoreEl.innerHTML = s;
+                lastScore = s;
+            }
         }
+
+        lastFrame = now;
 
         ctx.clearRect(0, 0, W, H);
         if (mode) mode.draw();
@@ -491,7 +531,10 @@
 
         resize();
         mode.reset();
-        scoreEl.innerHTML = mode.score();
+        lastScore = mode.score();
+        scoreEl.innerHTML = lastScore;
+        lastFrame = 0;   // pierwsza klatka po starcie zaczyna liczenie czasu od zera
+        acc = 0;
         running = true;
     }
 
@@ -502,6 +545,7 @@
         overEl.hidden = true;
         backEl.hidden = true;
         scoreEl.innerHTML = "";
+        lastScore = "";
         hintEl.textContent = "";
         ctx.clearRect(0, 0, W, H);
     }
@@ -592,6 +636,8 @@
         e.stopPropagation();
         overEl.hidden = true;
         mode.reset();
+        lastFrame = 0;
+        acc = 0;
         running = true;
     });
 
@@ -605,7 +651,7 @@
     window.__game = {
         open, close, startMode, showMenu, MODES,
         draw: () => mode && mode.draw(),
-        update: () => mode && mode.update(),
+        update: (dt = 1) => mode && mode.update(dt),
         isRunning: () => running,
         current: () => mode,
         pointer: (x, y) => mode && mode.pointer(x, y)
