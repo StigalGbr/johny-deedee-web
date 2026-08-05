@@ -119,6 +119,19 @@ const GAME_TEXTS = {
         hint: "Klikaj w pająki, zanim dojdą do Dee Dee. Trzy życia.",
         over: "Koniec. Dee Dee poszła na lody, a pająki zostały 🕷️🍦",
         lives: 3
+    },
+
+    // Kafel bez trybu gry: na razie pokazuje tylko gotowa plansze w okienku.
+    // Zasady sa w docs/akcja-w-karkonoszach.md, mechanika dojdzie pozniej.
+    wkrotce: {
+        name: "Górska przygoda",
+        icon: "🏔️",
+        blurb: "Planszówka: Johnny i Dee Dee ścigają się na Śnieżkę.",
+        badge: "NEW",
+        note: "w przygotowaniu",
+        preview: "pic/plansza/plansza-podglad.webp",
+        previewAlt: "Plansza gry Górska przygoda: 64 pola z Karpacza na Śnieżkę",
+        previewNote: "Plansza gotowa — zasady i pionki w przygotowaniu."
     }
 };
 

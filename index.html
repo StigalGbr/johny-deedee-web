@@ -17,7 +17,7 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -129,6 +129,16 @@
         </div>
 
         <p class="game__hint" id="game-hint"></p>
+
+        <!-- podglad planszy spod kafla "Górska przygoda" -->
+        <div class="preview" id="preview" hidden>
+            <div class="preview__box">
+                <button class="preview__close" id="preview-close" type="button"
+                    aria-label="Zamknij podgląd planszy">✕</button>
+                <img class="preview__img" id="preview-img" src="" alt="">
+                <p class="preview__note" id="preview-note"></p>
+            </div>
+        </div>
     </div>
 
     <aside class="plan" id="plan" hidden>
@@ -145,8 +155,8 @@
         <span class="final-count__label">sekund</span>
     </div>
 
-    <script src="lines.js?v=8"></script>
-    <script src="script.js?v=8"></script>
-    <script src="game.js?v=8"></script>
+    <script src="lines.js?v=9"></script>
+    <script src="script.js?v=9"></script>
+    <script src="game.js?v=9"></script>
 </body>
 </html>

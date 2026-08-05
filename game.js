@@ -550,6 +550,12 @@
         ctx.clearRect(0, 0, W, H);
     }
 
+    const previewEl = document.getElementById("preview");
+    const previewImg = document.getElementById("preview-img");
+    const previewNote = document.getElementById("preview-note");
+
+    const SOON = GAME_TEXTS.wkrotce;
+
     document.getElementById("game-menu-title").textContent = GAME_TEXTS.menuTitle;
     document.getElementById("game-menu-list").innerHTML = Object.entries(MODES)
         .map(([key, m]) => `<button class="game__pick" type="button" data-mode="${key}">
@@ -557,13 +563,49 @@
                 <span class="game__pick-name">${m.texts.name}</span>
                 <span class="game__pick-blurb">${m.texts.blurb}</span>
             </button>`)
-        .join("");
+        .join("")
+        // kafel bez trybu gry - otwiera podglad planszy zamiast startowac gre
+        + `<button class="game__pick game__pick--soon" type="button" data-preview="1">
+                <span class="game__pick-badge">${SOON.badge}</span>
+                <span class="game__pick-icon">${SOON.icon}</span>
+                <span class="game__pick-name">${SOON.name}</span>
+                <span class="game__pick-blurb">${SOON.blurb}</span>
+                <span class="game__pick-note">${SOON.note}</span>
+            </button>`;
+
+    function openPreview() {
+        // zrodlo ustawiamy dopiero przy otwarciu, zeby plansza nie ciagnela sie
+        // przy kazdym wejsciu na strone
+        if (!previewImg.getAttribute("src")) {
+            previewImg.src = SOON.preview;
+            previewImg.alt = SOON.previewAlt;
+            previewNote.textContent = SOON.previewNote;
+        }
+        previewEl.hidden = false;
+        document.getElementById("preview-close").focus();
+    }
+
+    function closePreview() {
+        previewEl.hidden = true;
+    }
 
     document.querySelectorAll(".game__pick").forEach((btn) => {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
+            if (btn.dataset.preview) return openPreview();
             startMode(btn.dataset.mode);
         });
+    });
+
+    document.getElementById("preview-close").addEventListener("click", (e) => {
+        e.stopPropagation();
+        closePreview();
+    });
+
+    // klik w tlo zamyka, klik w samo okno juz nie
+    previewEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (e.target === previewEl) closePreview();
     });
 
     // ---------- sterowanie ----------
@@ -590,7 +632,8 @@
 
     document.addEventListener("keydown", (e) => {
         if (gameEl.hidden) return;
-        if (e.key === "Escape") return close();
+        // Escape zamyka najpierw podglad planszy, dopiero potem cala gre
+        if (e.key === "Escape") return previewEl.hidden ? close() : closePreview();
         if (mode && running) mode.key(e);
     });
 
@@ -610,6 +653,7 @@
 
     function close() {
         gameEl.hidden = true;
+        previewEl.hidden = true;
         running = false;
         mode = null;
         cancelAnimationFrame(raf);
