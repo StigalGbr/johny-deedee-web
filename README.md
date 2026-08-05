@@ -74,9 +74,12 @@ licznik strzela konfetti.
 **Pająk i bazooka.** Potrząśnięcie telefonem wypuszcza tarantulę, która rusza
 w stronę Dee Dee. W połowie drogi Johnny wyciąga bazookę, strzela, pająk pęka
 w rozbryzgu w stylu starych strzelanek, ekranem szarpie, a Dee Dee dziękuje
-bohaterowi. iOS wymaga zgody na czujnik ruchu i to koniecznie z poziomu gestu,
-dlatego pyta o nią przycisk `🕷️ Obudź pająka` w planie wieczoru — ten sam
-przycisk odpala całą sekwencję na komputerze.
+bohaterowi. To samo robi przycisk `🕷️`.
+
+Nasłuch potrząśnięcia podpina się od razu po załadowaniu strony, więc działa
+bez wchodzenia gdziekolwiek. Wyjątkiem jest iOS, który wymaga zgody na czujnik
+ruchu i to koniecznie z poziomu gestu — tam nasłuch rusza dopiero po pierwszym
+kliknięciu przycisku pająka.
 
 Kolejne fazy tej sekwencji chodzą na `setTimeout`, a nie na `onfinish`
 animacji. Animacje są wstrzymywane w karcie w tle i sekwencja zatrzymałaby się

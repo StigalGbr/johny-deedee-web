@@ -536,9 +536,40 @@ body {
     outline: none;
 }
 
+/* pajak w tej samej stylistyce co pozostale przyciski w rogach */
+.spider-toggle {
+    position: fixed;
+    top: 55px;
+    left: 12px;
+    z-index: 9;
+    padding: 0.5rem 0.9rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(20, 20, 30, 0.62);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.spider-toggle:hover,
+.spider-toggle:focus-visible {
+    border-color: #ffd93b;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.spider-toggle__label {
+    margin-left: 0.4rem;
+}
+
+/* nizej niz przycisk pajaka, zeby go nie przykrywac po otwarciu */
 .plan {
     position: fixed;
-    top: 58px;
+    top: 101px;
     left: 12px;
     z-index: 9;
     width: min(320px, calc(100vw - 24px));
@@ -575,31 +606,6 @@ body {
 .plan__list b {
     flex: 0 0 3.2rem;
     color: #a24f24;
-}
-
-.plan__spider {
-    margin-top: 0.9rem;
-    width: 100%;
-    padding: 0.5rem;
-    font: inherit;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #fff;
-    background: #16161d;
-    border: 0;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.plan__spider:hover {
-    background: #a24f24;
-}
-
-.plan__hint {
-    margin-top: 0.45rem;
-    font-size: 0.7rem;
-    opacity: 0.6;
-    text-align: center;
 }
 
 /* ---------- efekty ---------- */
@@ -1180,22 +1186,25 @@ body.is-nerd .bubble--johny::before {
 
     .plan-toggle__label,
     .game-toggle__label,
-    .movie-toggle__label {
+    .movie-toggle__label,
+    .spider-toggle__label {
         display: none;
     }
 
     .game-toggle,
-    .movie-toggle {
+    .movie-toggle,
+    .spider-toggle {
         font-size: 0.95rem;
         padding: 0.35rem 0.5rem;
     }
 
-    .movie-toggle {
+    .movie-toggle,
+    .spider-toggle {
         top: 55px;
     }
 
     .plan {
-        top: 50px;
+        top: 98px;
     }
 
     /* na waskim ekranie plansza jest niska, wiec kafle wyboru gry musza sie

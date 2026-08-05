@@ -17,7 +17,7 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -82,6 +82,12 @@
         📋<span class="plan-toggle__label">Plan wieczoru</span>
     </button>
 
+    <!-- pajak -->
+    <button class="spider-toggle" id="spider-btn" type="button" aria-label="Obudź pająka"
+        title="Na telefonie wystarczy potrząsnąć">
+        🕷️<span class="spider-toggle__label">Obudź pająka</span>
+    </button>
+
     <!-- tryb gry -->
     <button class="game-toggle" id="game-toggle" type="button" aria-label="Gry">
         🎮<span class="game-toggle__label">Gry</span>
@@ -128,10 +134,6 @@
     <aside class="plan" id="plan" hidden>
         <h2 class="plan__title">Plan wieczoru</h2>
         <ol class="plan__list" id="plan-list"></ol>
-        <button class="plan__spider" id="spider-btn" type="button">
-            🕷️ Obudź pająka
-        </button>
-        <p class="plan__hint">Na telefonie wystarczy potrząsnąć.</p>
     </aside>
 
     <!-- efekty -->
@@ -143,8 +145,8 @@
         <span class="final-count__label">sekund</span>
     </div>
 
-    <script src="lines.js?v=6"></script>
-    <script src="script.js?v=6"></script>
-    <script src="game.js?v=6"></script>
+    <script src="lines.js?v=7"></script>
+    <script src="script.js?v=7"></script>
+    <script src="game.js?v=7"></script>
 </body>
 </html>

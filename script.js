@@ -596,19 +596,33 @@ function onDeviceMotion(event) {
     }
 }
 
-// iOS wymaga zgody i to koniecznie z poziomu gestu uzytkownika,
-// dlatego pytamy dopiero po kliknieciu przycisku.
+let shakeListening = false;
+
+function listenForShake() {
+    if (shakeListening) return;
+    shakeListening = true;
+    window.addEventListener("devicemotion", onDeviceMotion);
+}
+
+// Android i przegladarki bez pytania o zgode podpinamy od razu po zaladowaniu,
+// zeby potrzasniecie dzialalo bez wchodzenia gdziekolwiek. iOS wymaga zgody
+// i to koniecznie z poziomu gestu, wiec tam czekamy na przycisk.
+if (typeof DeviceMotionEvent !== "undefined"
+    && typeof DeviceMotionEvent.requestPermission !== "function") {
+    listenForShake();
+}
+
 function enableShake() {
-    if (typeof DeviceMotionEvent === "undefined") return;
+    if (typeof DeviceMotionEvent === "undefined" || shakeListening) return;
 
     if (typeof DeviceMotionEvent.requestPermission === "function") {
         DeviceMotionEvent.requestPermission()
             .then((state) => {
-                if (state === "granted") window.addEventListener("devicemotion", onDeviceMotion);
+                if (state === "granted") listenForShake();
             })
             .catch(() => { });
     } else {
-        window.addEventListener("devicemotion", onDeviceMotion);
+        listenForShake();
     }
 }
 
@@ -702,13 +716,22 @@ el("plan-list").innerHTML = PLAN
     .map(([time, what]) => `<li><b>${time}</b><span>${what}</span></li>`)
     .join("");
 
+function setPlan(open) {
+    planEl.hidden = !open;
+    planToggle.setAttribute("aria-expanded", String(open));
+}
+
 planToggle.addEventListener("click", (event) => {
     event.stopPropagation();
-    planEl.hidden = !planEl.hidden;
-    planToggle.setAttribute("aria-expanded", String(!planEl.hidden));
+    setPlan(planEl.hidden);
 });
 
+// klikniecie w sam plan go nie zamyka, klikniecie gdziekolwiek indziej tak
 planEl.addEventListener("click", (event) => event.stopPropagation());
+document.addEventListener("click", () => setPlan(false));
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setPlan(false);
+});
 
 // ============================================================
 //  FILM
