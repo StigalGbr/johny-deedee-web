@@ -44,39 +44,121 @@ body {
     pointer-events: none;
 }
 
-/* ---------- napis z roznych liter ---------- */
+/* ---------- gorny napis: tytul kreskowki ---------- */
+
+.splash__show {
+    font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+    font-size: clamp(1.5rem, 6.5vw, 3.2rem);
+    letter-spacing: 0.06em;
+    line-height: 1;
+    color: #ffd93b;
+    text-transform: uppercase;
+    text-align: center;
+    transform: rotate(-3deg);
+
+    /* gruby czarny kontur jak w logo kreskowki - obrys rysowany pod
+       wypelnieniem, zeby nie zjadal ksztaltu liter */
+    -webkit-text-stroke: 5px #16161d;
+    paint-order: stroke fill;
+    text-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);
+    animation: show-pop 0.7s cubic-bezier(0.22, 1.5, 0.4, 1);
+}
+
+@keyframes show-pop {
+    from {
+        opacity: 0;
+        transform: rotate(-3deg) scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotate(-3deg) scale(1);
+    }
+}
+
+/* ---------- dolny napis: rozowy neon ---------- */
 
 .splash__title {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: baseline;
-    gap: 0.04em;
-    line-height: 1.05;
+    gap: 0 0.28em;
+    line-height: 1.15;
     text-align: center;
+
+    /* pismo odreczne, bo takie sa szyldy nad wejsciami w Vegas.
+       Na koncu zwykla kursywa systemowa, gdyby zadnego nie bylo. */
+    font-family: "Brush Script MT", "Segoe Script", "Snell Roundhand", "Lucida Handwriting", cursive;
+    font-size: clamp(2.4rem, 12vw, 6rem);
+    font-weight: 400;
+    letter-spacing: 0.01em;
 }
 
+/* caly wyraz trzyma sie razem, lamiemy tylko miedzy wyrazami */
+.splash__word {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+/* Neon to jasny rdzen rurki i kilka warstw poswiaty wokol. Bez ciemnego
+   obrysu - rurka swieci, a nie jest obrysowana. */
 .splash__letter {
     display: inline-block;
-    -webkit-text-stroke: 2px #16161d;
-    paint-order: stroke fill;
-    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    animation: letter-bob 2.2s ease-in-out infinite;
+    color: #fff2f8;
+    transform: rotate(var(--tilt));
+    text-shadow:
+        0 0 4px #fff,
+        0 0 11px #ff9ecd,
+        0 0 24px #ff4fa3,
+        0 0 44px #ff1e88,
+        0 0 78px #e0006e;
+    animation: neon-hum 3.4s ease-in-out infinite;
 }
 
-.splash__letter--space {
-    width: 0.45em;
+/* Prawdziwe szyldy nigdy nie swieca rowno - jedna czy dwie litery lapia
+   zadyszke. Ta klasa trafia losowo na kilka z nich. */
+.splash__letter--flicker {
+    animation: neon-flicker 4.6s linear infinite;
 }
 
-@keyframes letter-bob {
+@keyframes neon-hum {
 
     0%,
     100% {
-        transform: translateY(0) rotate(var(--tilt));
+        opacity: 1;
     }
 
     50% {
-        transform: translateY(-8px) rotate(calc(var(--tilt) * -1));
+        opacity: 0.88;
+    }
+}
+
+@keyframes neon-flicker {
+
+    0%,
+    17%,
+    19%,
+    23%,
+    47%,
+    100% {
+        opacity: 1;
+        text-shadow:
+            0 0 4px #fff,
+            0 0 11px #ff9ecd,
+            0 0 24px #ff4fa3,
+            0 0 44px #ff1e88,
+            0 0 78px #e0006e;
+    }
+
+    18%,
+    22%,
+    46% {
+        opacity: 0.35;
+        text-shadow:
+            0 0 3px #ffd7ea,
+            0 0 7px #ff7bbb;
     }
 }
 
@@ -84,7 +166,8 @@ body {
 
 .splash__photo {
     max-width: min(86vw, 620px);
-    max-height: 52vh;
+    /* nizej niz 52vh, bo doszedl drugi napis nad zdjeciem */
+    max-height: 44vh;
     height: auto;
     filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
     animation: splash-breathe 3.4s ease-in-out infinite;

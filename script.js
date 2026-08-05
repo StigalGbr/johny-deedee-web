@@ -14,20 +14,8 @@ const REPLY_DELAY_MS = 3500;    // odstep miedzy kwestiami w duecie
 const SPLASH_MIN_MS = 5500;      // tyle splash wisi, nawet gdy wszystko gotowe
 const SPLASH_TIMEOUT_MS = 12000; // bezpiecznik, gdyby obrazek nie doszedl
 
-// Kazda litera napisu powitalnego bierze kolejny kroj i kolor z tych list.
-const SPLASH_FONTS = [
-    "Impact, fantasy",
-    "Georgia, serif",
-    '"Comic Sans MS", cursive',
-    '"Courier New", monospace',
-    '"Trebuchet MS", sans-serif',
-    '"Times New Roman", serif',
-    "cursive",
-    '"Arial Black", sans-serif'
-];
-
-const SPLASH_COLORS = ["#ffd93b", "#ff5f6d", "#7dff8a", "#5bc0eb", "#ffffff", "#ff9de2"];
 const SPLASH_HEARTS = ["❤️", "💕", "💖", "💗", "💘"];
+const SPLASH_FLICKER_CHANCE = 0.25;   // tyle liter szyldu lapie zadyszke
 const URGENT_FROM_MS = 3600000; // ostatnia godzina - licznik sie niecierpliwi
 const FINAL_FROM_MS = 60000;    // ostatnia minuta - odliczanie na pelny ekran
 const NERD_CLICKS = 5;          // tyle klikniec w Johnnyego wlacza tryb nerda
@@ -800,29 +788,33 @@ function preloadImage(url) {
     });
 }
 
-// Napis skladamy z pojedynczych liter, kazda innym krojem i kolorem.
+// Napis skladamy z pojedynczych liter, zeby kazda mogla mrugac wlasnym
+// rytmem - rowno swiecacy neon wyglada jak druk, a nie jak szyld.
 function buildSplashTitle() {
+    el("splash-show").textContent = SPLASH_SHOW;
+
     const title = el("splash-title");
     title.setAttribute("aria-label", SPLASH_TITLE);
 
-    [...SPLASH_TITLE].forEach((sign, i) => {
-        const letter = document.createElement("span");
+    // Litery grupujemy w wyrazy, bo same z siebie sa osobnymi elementami
+    // i napis lamal sie w polowie slowa na waskim ekranie.
+    SPLASH_TITLE.split(" ").forEach((word) => {
+        const box = document.createElement("span");
+        box.className = "splash__word";
 
-        if (sign === " ") {
-            letter.className = "splash__letter splash__letter--space";
-            title.appendChild(letter);
-            return;
-        }
+        [...word].forEach((sign) => {
+            const letter = document.createElement("span");
+            letter.className = "splash__letter";
+            if (Math.random() < SPLASH_FLICKER_CHANCE) letter.classList.add("splash__letter--flicker");
 
-        letter.className = "splash__letter";
-        letter.textContent = sign;
-        letter.style.fontFamily = SPLASH_FONTS[i % SPLASH_FONTS.length];
-        letter.style.color = SPLASH_COLORS[i % SPLASH_COLORS.length];
-        letter.style.fontSize = `clamp(1.6rem, ${7 + randomInt(4)}vw, ${3.2 + Math.random()}rem)`;
-        letter.style.setProperty("--tilt", `${(Math.random() - 0.5) * 16}deg`);
-        letter.style.animationDelay = `${i * 0.08}s`;
+            letter.textContent = sign;
+            letter.style.setProperty("--tilt", `${(Math.random() - 0.5) * 7}deg`);
+            letter.style.animationDelay = `${(Math.random() * -5).toFixed(2)}s`;
 
-        title.appendChild(letter);
+            box.appendChild(letter);
+        });
+
+        title.appendChild(box);
     });
 }
 
