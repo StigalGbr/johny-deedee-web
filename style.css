@@ -106,14 +106,14 @@ body {
    obrysu - rurka swieci, a nie jest obrysowana. */
 .splash__letter {
     display: inline-block;
-    color: #fff2f8;
+    color: #f2fdff;
     transform: rotate(var(--tilt));
     text-shadow:
         0 0 4px #fff,
-        0 0 11px #ff9ecd,
-        0 0 24px #ff4fa3,
-        0 0 44px #ff1e88,
-        0 0 78px #e0006e;
+        0 0 11px #a8f0ff,
+        0 0 24px #4fd8ff,
+        0 0 44px #12b4e8,
+        0 0 78px #0083bf;
     animation: neon-hum 3.4s ease-in-out infinite;
 }
 
@@ -146,10 +146,10 @@ body {
         opacity: 1;
         text-shadow:
             0 0 4px #fff,
-            0 0 11px #ff9ecd,
-            0 0 24px #ff4fa3,
-            0 0 44px #ff1e88,
-            0 0 78px #e0006e;
+            0 0 11px #a8f0ff,
+            0 0 24px #4fd8ff,
+            0 0 44px #12b4e8,
+            0 0 78px #0083bf;
     }
 
     18%,
@@ -157,8 +157,8 @@ body {
     46% {
         opacity: 0.35;
         text-shadow:
-            0 0 3px #ffd7ea,
-            0 0 7px #ff7bbb;
+            0 0 3px #d7f6ff,
+            0 0 7px #7bd9ff;
     }
 }
 
@@ -283,33 +283,6 @@ body {
 
 .countdown:active {
     transform: scale(0.97);
-}
-
-/* ostatnia godzina - licznik zaczyna sie niecierpliwic */
-.countdown.is-urgent {
-    color: #ffd93b;
-    border-color: #ffd93b;
-    animation: countdown-pulse 1s ease-in-out infinite;
-}
-
-.countdown.is-finished {
-    background: rgba(200, 30, 30, 0.75);
-    border-color: #ffd93b;
-    animation: none;
-}
-
-@keyframes countdown-pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 217, 59, 0.5);
-    }
-
-    50% {
-        transform: scale(1.03);
-        box-shadow: 0 0 0 12px rgba(255, 217, 59, 0);
-    }
 }
 
 /* ---------- postacie ---------- */
@@ -447,24 +420,6 @@ body {
     border-color: #fff transparent transparent transparent;
 }
 
-/* wspolny dymek finalowy - jeden na dwoje, na srodku sceny */
-.bubble--finale {
-    position: absolute;
-    left: 50%;
-    bottom: 62%;
-    transform: translateX(-50%);
-    max-width: min(30ch, 70vw);
-    text-align: center;
-    font-size: clamp(1.1rem, 2.4vw, 2rem);
-    background: #ffd93b;
-    z-index: 6;
-}
-
-.bubble--finale::before,
-.bubble--finale::after {
-    display: none;
-}
-
 @keyframes bubble-pop {
     from {
         opacity: 0;
@@ -475,34 +430,6 @@ body {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
-}
-
-/* dymek finalowy ma wlasny transform, wiec i wlasne wejscie */
-.bubble--finale {
-    animation: finale-pop 0.35s ease-out;
-}
-
-@keyframes finale-pop {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) scale(0.7);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-    }
-}
-
-/* ---------- final: postacie schodza sie na srodek ---------- */
-
-.stage.is-finale {
-    justify-content: center;
-    gap: 0;
-}
-
-.stage.is-finale .char {
-    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ---------- plan wieczoru ---------- */
@@ -929,6 +856,13 @@ body.is-nerd .bubble--johny::before {
     width: min(900px, 96vw);
 }
 
+/* plansza gorska jest wysoka (1536x2048), wiec szerokosc ograniczamy
+   wysokoscia okna - inaczej przy width: min(900px, 96vw) plansza wyjezdzalaby
+   ponizej dolnej krawedzi ekranu (patrz docs/akcja-w-karkonoszach.md, 7.1a) */
+.game__stack--plansza {
+    width: min(900px, 94vw, 60vh);
+}
+
 .game__canvas {
     display: block;
     width: 100%;
@@ -990,6 +924,7 @@ body.is-nerd .bubble--johny::before {
 }
 
 .game__pick {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1028,11 +963,6 @@ body.is-nerd .bubble--johny::before {
     opacity: 0.75;
 }
 
-/* kafel zapowiedzi - jeszcze bez trybu gry, otwiera sam podglad planszy */
-.game__pick--soon {
-    position: relative;
-}
-
 .game__pick-badge {
     position: absolute;
     top: -0.6rem;
@@ -1048,90 +978,47 @@ body.is-nerd .bubble--johny::before {
     transform: rotate(8deg);
 }
 
-.game__pick-note {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #8a6d00;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
+/* ---------- pasek kostki (tryb "Gorska przygoda") ---------- */
 
-/* ---------- podglad planszy ---------- */
-
-.preview {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
+.dice {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.8rem;
-    background: rgba(8, 5, 10, 0.86);
-    border-radius: 16px;
+    gap: 0.8rem;
 }
 
-.preview[hidden] {
+.dice[hidden] {
     display: none;
 }
 
-.preview__box {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    max-width: 100%;
-    height: 100%;
-    min-height: 0;
-}
-
-.preview__img {
-    /* Plansza jest wysoka (3:4), a panel gry bywa szeroki albo waski - obrazek
-       ma zmiescic sie na wysokosc razem z podpisem i przy tym zachowac ksztalt,
-       zeby ramka obejmowala sama plansze, a nie pusty prostokat.
-       max-height w procentach dziala tylko dlatego, ze .preview__box dostaje
-       height: 100% (przy wysokosci automatycznej procent rozwiazalby sie do
-       "none"). flex-grow zostaje na 0, inaczej obrazek rozciagnalby pudelko na
-       cala wolna wysokosc; min-height: 0 pozwala mu zmalec ponizej wlasnej. */
-    flex: 0 1 auto;
-    min-height: 0;
-    width: auto;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1536 / 2048;
-    object-fit: contain;
-    border: 3px solid #16161d;
-    border-radius: 12px;
-    background: #0d1018;
-}
-
-.preview__note {
-    font-size: clamp(0.7rem, 1.6vw, 0.85rem);
-    color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-}
-
-.preview__close {
-    position: absolute;
-    top: -0.6rem;
-    right: -0.6rem;
-    z-index: 1;
-    width: 2rem;
-    height: 2rem;
+.dice__roll {
+    padding: 0.6rem 1.3rem;
     font: inherit;
     font-size: 1rem;
-    line-height: 1;
+    font-weight: 700;
     color: #16161d;
-    background: #fff;
+    background: #ffd93b;
     border: 3px solid #16161d;
-    border-radius: 50%;
+    border-radius: 999px;
     cursor: pointer;
+    transition: transform 0.15s ease;
 }
 
-.preview__close:hover,
-.preview__close:focus-visible {
-    background: #ffd93b;
+.dice__roll:hover:not(:disabled),
+.dice__roll:focus-visible:not(:disabled) {
+    transform: translateY(-2px);
     outline: none;
+}
+
+.dice__roll:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.dice__who {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .game__hint {
@@ -1176,54 +1063,6 @@ body.is-nerd .bubble--johny::before {
     cursor: pointer;
 }
 
-/* ---------- ostatnie 60 sekund ---------- */
-
-.final-count {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    pointer-events: none;
-    background: rgba(10, 6, 10, 0.55);
-    backdrop-filter: blur(2px);
-}
-
-.final-count[hidden] {
-    display: none;
-}
-
-.final-count__number {
-    font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-    font-size: clamp(6rem, 30vw, 20rem);
-    line-height: 1;
-    color: #ffd93b;
-    text-shadow: 0 0 40px rgba(255, 217, 59, 0.55);
-    animation: final-tick 1s ease-out infinite;
-}
-
-.final-count__label {
-    font-size: clamp(1rem, 3vw, 1.8rem);
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: #fff;
-}
-
-@keyframes final-tick {
-    0% {
-        transform: scale(1.25);
-        opacity: 0.4;
-    }
-
-    35% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
 
 /* ---------- niskie ekrany: robimy miejsce na dymki nad postaciami ---------- */
 
@@ -1278,13 +1117,8 @@ body.is-nerd .bubble--johny::before {
         right: 12%;
     }
 
-    .bubble--finale {
-        max-width: 80vw;
-        bottom: 66%;
-    }
-
     /* na waskim ekranie zostaje sama ikona - z podpisem przycisk wchodzil
-       na wysrodkowany licznik */
+       na wysrodkowany naglowek */
     .plan-toggle {
         font-size: 0.95rem;
         padding: 0.35rem 0.5rem;
@@ -1340,10 +1174,6 @@ body.is-nerd .bubble--johny::before {
         font-size: 0.6rem;
     }
 
-    .game__pick-note {
-        font-size: 0.6rem;
-    }
-
     .game__pick-icon {
         font-size: 1.4rem;
     }
@@ -1366,7 +1196,7 @@ body.is-nerd .bubble--johny::before {
     .splash__photo,
     .splash__heart,
     .countdown,
-    .final-count__number {
+    .dice__roll {
         animation: none;
         transition: none;
     }

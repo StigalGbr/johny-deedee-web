@@ -4,11 +4,6 @@
 //  USTAWIENIA
 // ============================================================
 
-// Domyslny cel: 5 sierpnia 2026, 20:00 czasu polskiego (CEST = UTC+2).
-// Strefa jest zapisana na sztywno, zeby kazdy widzial ten sam wynik
-// niezaleznie od ustawien swojej przegladarki.
-const DEFAULT_TARGET = "2026-08-05T20:00:00+02:00";
-
 const CYCLE_MS = 10000;         // przerwa miedzy dialogami
 const REPLY_DELAY_MS = 3500;    // odstep miedzy kwestiami w duecie
 const SPLASH_MIN_MS = 5500;      // tyle splash wisi, nawet gdy wszystko gotowe
@@ -16,8 +11,6 @@ const SPLASH_TIMEOUT_MS = 12000; // bezpiecznik, gdyby obrazek nie doszedl
 
 const SPLASH_HEARTS = ["❤️", "💕", "💖", "💗", "💘"];
 const SPLASH_FLICKER_CHANCE = 0.25;   // tyle liter szyldu lapie zadyszke
-const URGENT_FROM_MS = 3600000; // ostatnia godzina - licznik sie niecierpliwi
-const FINAL_FROM_MS = 60000;    // ostatnia minuta - odliczanie na pelny ekran
 const NERD_CLICKS = 5;          // tyle klikniec w Johnnyego wlacza tryb nerda
 const NERD_DURATION_MS = 25000;
 const SHAKE_THRESHOLD = 22;
@@ -30,8 +23,6 @@ const el = (id) => document.getElementById(id);
 const countdownEl = el("countdown");
 const stageEl = el("stage");
 const fxEl = el("fx");
-const finalCountEl = el("final-count");
-const finalNumberEl = el("final-count-number");
 const bubbles = {
     johny: el("bubble-johny"),
     deedee: el("bubble-deedee")
@@ -39,90 +30,7 @@ const bubbles = {
 
 const randomInt = (max) => Math.floor(Math.random() * max);
 
-// ============================================================
-//  DATA DOCELOWA
-// ============================================================
-
-// Date mozna podmienic przez adres:
-//   ?do=2026-09-12T19:00   - konkretna godzina
-//   ?do=2026-09-12         - sama data, godzina domyslna 20:00
-// Bez podanej strefy przyjmujemy czas polski, czyli to samo co domyslnie.
-function readTarget() {
-    const raw = (new URLSearchParams(location.search).get("do") || "").trim();
-    if (!raw) return new Date(DEFAULT_TARGET);
-
-    let value = raw;
-    if (!value.includes("T")) value += "T20:00";
-    if (/T\d{2}:\d{2}$/.test(value)) value += ":00";
-    if (!/(Z|[+-]\d{2}:?\d{2})$/.test(value)) value += "+02:00";
-
-    const parsed = new Date(value);
-    return isNaN(parsed) ? new Date(DEFAULT_TARGET) : parsed;
-}
-
-const TARGET = readTarget();
-
-// ============================================================
-//  LICZNIK
-// ============================================================
-
-function splitTime(ms) {
-    const total = Math.floor(ms / 1000);
-    return {
-        hours: Math.floor(total / 3600),
-        minutes: Math.floor((total % 3600) / 60),
-        seconds: total % 60
-    };
-}
-
-let finaleStarted = false;
 let sceneStarted = false;
-
-function renderCountdown() {
-    const msLeft = TARGET.getTime() - Date.now();
-
-    if (msLeft <= 0) {
-        // final odpalamy dopiero po zejsciu splasha, zeby konfetti nie poszlo
-        // w powietrze za zaslona
-        if (sceneStarted) startFinale();
-        renderElapsed(-msLeft);
-        return;
-    }
-
-    const { hours, minutes, seconds } = splitTime(msLeft);
-
-    if (msLeft > URGENT_FROM_MS) {
-        countdownEl.textContent = `Pozostało ${hours}h ${minutes}min ${seconds} sek`;
-        countdownEl.classList.remove("is-urgent");
-        hideFinalCount();
-        return;
-    }
-
-    countdownEl.classList.add("is-urgent");
-
-    if (msLeft > FINAL_FROM_MS) {
-        countdownEl.textContent = `Ostatnia prosta! ${minutes}min ${seconds} sek`;
-        hideFinalCount();
-        return;
-    }
-
-    // ostatnia minuta - wielkie cyfry na pelny ekran
-    countdownEl.textContent = "Ostatnie sekundy!";
-    finalCountEl.hidden = false;
-    finalNumberEl.textContent = Math.ceil(msLeft / 1000);
-}
-
-// po dojsciu do zera licznik zaczyna liczyc w gore
-function renderElapsed(ms) {
-    const { hours, minutes, seconds } = splitTime(ms);
-    countdownEl.textContent = `Randka trwa ${hours}h ${minutes}min ${seconds} sek 🎉`;
-}
-
-function hideFinalCount() {
-    if (!finalCountEl.hidden) finalCountEl.hidden = true;
-}
-
-setInterval(renderCountdown, 250);
 
 // ============================================================
 //  DYMKI I DIALOGI
@@ -169,8 +77,6 @@ function playDialog(index) {
 }
 
 function nextDialog() {
-    if (finaleStarted) return;
-
     let index;
     do {
         index = randomInt(DIALOGS.length);
@@ -193,7 +99,7 @@ function randomSoloLine(who) {
 
 function scheduleNextDialog(delay = CYCLE_MS) {
     clearDialogTimers();
-    if (!finaleStarted) dialogTimers.push(setTimeout(nextDialog, delay));
+    dialogTimers.push(setTimeout(nextDialog, delay));
 }
 
 // ============================================================
@@ -203,8 +109,6 @@ function scheduleNextDialog(delay = CYCLE_MS) {
 document.querySelectorAll(".char__btn").forEach((btn) => {
     btn.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (finaleStarted) return;
-
         const who = btn.dataset.char;
         const bubble = bubbles[who];
         const img = btn.querySelector(".char__img");
@@ -228,7 +132,6 @@ document.querySelectorAll(".char__btn").forEach((btn) => {
 
 // klikniecie gdziekolwiek indziej / Escape chowa dymek
 function dismissBubbles() {
-    if (finaleStarted) return;
     hideBubbles();
     scheduleNextDialog();
 }
@@ -316,7 +219,7 @@ const ROCKET_MS = 320;
 let spiderBusy = false;
 
 function releaseSpider() {
-    if (spiderBusy || finaleStarted) return;
+    if (spiderBusy) return;
     spiderBusy = true;
 
     const size = Math.min(170, Math.max(80, Math.round(window.innerWidth * 0.11)));
@@ -514,68 +417,15 @@ function stepConfetti() {
     confettiRaf = confettiPieces.length ? requestAnimationFrame(stepConfetti) : null;
 }
 
+// Licznika juz nie ma, ale przycisk zostaje jako przelacznik konfetti -
+// efekt jest napisany i szkoda go wyrzucac razem z odliczaniem.
+countdownEl.textContent = HEADER_LINE;
+
 countdownEl.addEventListener("click", (event) => {
     event.stopPropagation();
     const rect = countdownEl.getBoundingClientRect();
     fireConfetti(70, rect.left + rect.width / 2, rect.bottom + 10);
 });
-
-// ============================================================
-//  FINAL
-// ============================================================
-
-function startFinale() {
-    if (finaleStarted) return;
-    finaleStarted = true;
-
-    clearDialogTimers();
-    hideBubbles();
-    hideFinalCount();
-
-    countdownEl.classList.remove("is-urgent");
-    countdownEl.classList.add("is-finished");
-
-    moveCharactersTogether();
-
-    const finaleBubble = el("bubble-finale");
-    finaleBubble.textContent = FINALE_LINE;
-    setTimeout(() => { finaleBubble.hidden = false; }, 900);
-
-    // trzy salwy z roznych stron
-    fireConfetti(120, window.innerWidth * 0.2, window.innerHeight);
-    setTimeout(() => fireConfetti(120, window.innerWidth * 0.8, window.innerHeight), 350);
-    setTimeout(() => fireConfetti(160, window.innerWidth * 0.5, window.innerHeight * 0.9), 800);
-}
-
-// FLIP: mierzymy pozycje przed i po zmianie layoutu, cofamy roznice
-// transformem i puszczamy animacje do zera. Dziala przy kazdej szerokosci
-// ekranu, w przeciwienstwie do sztywnego przesuniecia.
-//
-// Zdejmowanie transformu robimy synchronicznie, po wymuszonym przeliczeniu
-// stylow, a nie w requestAnimationFrame. W karcie w tle rAF jest wstrzymany,
-// a licznik dobija do zera wlasnie wtedy, gdy nikt na strone nie patrzy -
-// postacie zostalyby wtedy w cofnietej pozycji.
-function moveCharactersTogether() {
-    const chars = [...document.querySelectorAll(".char")];
-    const before = chars.map((char) => char.getBoundingClientRect().left);
-
-    stageEl.classList.add("is-finale");
-
-    chars.forEach((char, i) => {
-        const shift = before[i] - char.getBoundingClientRect().left;
-        char.style.transition = "none";
-        char.style.transform = `translateX(${shift}px)`;
-    });
-
-    // wymuszamy przeliczenie stylow z cofnietym przesunieciem,
-    // zeby bylo od czego animowac
-    void stageEl.offsetWidth;
-
-    chars.forEach((char) => {
-        char.style.transition = "";
-        char.style.transform = "";
-    });
-}
 
 // ============================================================
 //  PAJAK: przycisk i potrzasniecie telefonem
@@ -861,8 +711,7 @@ function revealScene() {
     if (sceneStarted) return;
     sceneStarted = true;
 
-    renderCountdown();
-    if (!finaleStarted) playDialog(OPENING_DIALOG_INDEX);
+    playDialog(OPENING_DIALOG_INDEX);
 
     splash.classList.add("is-hidden");
     splash.addEventListener("transitionend", () => splash.remove(), { once: true });

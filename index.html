@@ -17,15 +17,16 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
     <div class="splash" id="splash" role="status" aria-label="Ładowanie">
         <div class="splash__hearts" id="splash-hearts" aria-hidden="true"></div>
 
-        <p class="splash__show" id="splash-show"></p>
+        <!-- neon na gorze, pod nim podpis w stylu tytulu kreskowki -->
         <h1 class="splash__title" id="splash-title"></h1>
+        <p class="splash__show" id="splash-show"></p>
 
         <img class="splash__photo" src="pic/splash.webp" alt="Johnny Bravo i Dee Dee" width="987" height="666"
             fetchpriority="high">
@@ -59,8 +60,6 @@
                 </button>
 
             </div>
-
-            <div class="bubble bubble--finale" id="bubble-finale" hidden></div>
 
             <div class="char char--deedee">
                 <div class="bubble bubble--deedee" id="bubble-deedee" hidden>
@@ -114,7 +113,7 @@
             <button class="game__close" id="game-close" type="button" aria-label="Zamknij grę">✕</button>
         </div>
 
-        <div class="game__stack">
+        <div class="game__stack" id="game-stack">
             <canvas class="game__canvas" id="game-canvas"></canvas>
 
             <div class="game__menu" id="game-menu">
@@ -128,17 +127,14 @@
             </div>
         </div>
 
-        <p class="game__hint" id="game-hint"></p>
-
-        <!-- podglad planszy spod kafla "Górska przygoda" -->
-        <div class="preview" id="preview" hidden>
-            <div class="preview__box">
-                <button class="preview__close" id="preview-close" type="button"
-                    aria-label="Zamknij podgląd planszy">✕</button>
-                <img class="preview__img" id="preview-img" src="" alt="">
-                <p class="preview__note" id="preview-note"></p>
-            </div>
+        <!-- pasek kostki trybu "Gorska przygoda" - zwykly przycisk w DOM, nie
+             obszar na plotnie (samo poruszenie mysza nie moze rzucac kostka) -->
+        <div class="dice" id="dice" hidden>
+            <button class="dice__roll" id="dice-roll" type="button">🎲 Rzuć kostką</button>
+            <span class="dice__who" id="dice-who"></span>
         </div>
+
+        <p class="game__hint" id="game-hint"></p>
     </div>
 
     <aside class="plan" id="plan" hidden>
@@ -150,13 +146,9 @@
     <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
     <div class="fx" id="fx" aria-hidden="true"></div>
 
-    <div class="final-count" id="final-count" hidden aria-hidden="true">
-        <span class="final-count__number" id="final-count-number">60</span>
-        <span class="final-count__label">sekund</span>
-    </div>
-
-    <script src="lines.js?v=9"></script>
-    <script src="script.js?v=9"></script>
-    <script src="game.js?v=9"></script>
+    <script src="lines.js?v=11"></script>
+    <script src="script.js?v=11"></script>
+    <script src="plansza-trasa.js?v=1"></script>
+    <script src="game.js?v=12"></script>
 </body>
 </html>

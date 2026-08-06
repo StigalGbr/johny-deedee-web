@@ -82,13 +82,12 @@ const DIALOGS = [
 // Dialog pokazywany zaraz po wejsciu na strone.
 const OPENING_DIALOG_INDEX = 0;
 
-// Ekran powitalny ma dwa napisy jeden nad drugim: gorny jak tytul kreskowki,
-// dolny swiecacy jak rozowy neon nad wejsciem do klubu.
-const SPLASH_SHOW = "Johny & Dee Dee";
-const SPLASH_TITLE = "Misja Vertigo";
+// Ekran powitalny: na gorze swiecacy neon, pod nim podpis jak tytul kreskowki.
+const SPLASH_TITLE = "Przygody";
+const SPLASH_SHOW = "Johnny'ego & Dee Dee";
 
-// Finał, czyli co postacie mowia po dojsciu licznika do zera.
-const FINALE_LINE = "No to lecimy! 💃🍦";
+// Napis na przycisku w naglowku sceny (klikniecie sypie konfetti).
+const HEADER_LINE = "Przygody Johnny'ego & Dee Dee 🎉";
 
 // Reakcje na akcje uzytkownika.
 const REACTIONS = {
@@ -121,17 +120,145 @@ const GAME_TEXTS = {
         lives: 3
     },
 
-    // Kafel bez trybu gry: na razie pokazuje tylko gotowa plansze w okienku.
-    // Zasady sa w docs/akcja-w-karkonoszach.md, mechanika dojdzie pozniej.
-    wkrotce: {
+    // Plansza "Akcja w Karkonoszach" - zasady w docs/akcja-w-karkonoszach.md.
+    gorska: {
         name: "Górska przygoda",
         icon: "🏔️",
         blurb: "Planszówka: Johnny i Dee Dee ścigają się na Śnieżkę.",
-        badge: "NEW",
-        note: "w przygotowaniu",
-        preview: "pic/plansza/plansza-podglad.webp",
-        previewAlt: "Plansza gry Górska przygoda: 64 pola z Karpacza na Śnieżkę",
-        previewNote: "Plansza gotowa — zasady i pionki w przygotowaniu."
+        hint: "Rzuć kostką (albo naciśnij spację) i idź polami na szczyt Śnieżki.",
+        badge: "NEW"
+    }
+};
+
+// Dymki postaci w gre planszowej. Pokazuja sie na koncu tury: po rzucie, po
+// dojsciu pionka na pole i po plakietce z efektem.
+//
+// Klucz to typ pola z plansza-trasa.js, "spotkanie" to zejscie sie obu pionkow,
+// a "zwykle" to pula ogolna dla pol bez efektu (leci tylko czasem, zeby gra nie
+// zamienila sie w sciane tekstu).
+//
+// Kto jest kim - patrz docs/bohaterowie.md. Krotko, z emotka i tak, zeby po
+// samym tekscie dalo sie poznac postac.
+const GAME_BUBBLES = {
+    bonus: {
+        johny: [
+            "Zoptymalizowałem trasę 📊⛰️",
+            "To przewaga technologiczna 🤓⚡",
+            "Skrót wydrukowany w 3D 🖨️😎"
+        ],
+        deedee: [
+            "Staruszek mnie nie złapie 👴😜",
+            "To za te spodenki! 🩳💨",
+            "Szybsza niż Loki po pampucha 🐕🍩"
+        ]
+    },
+
+    wind: {
+        johny: [
+            "Za moich czasów wiało wolniej 👴🌬️",
+            "Okulary poleciały. Znowu 🤓💨",
+            "To nie porażka, to rollback 💾😖"
+        ],
+        deedee: [
+            "O kurczę, już go nie dogonię 😩🌬️",
+            "Wiatr zniszczył mi fryzurę! 💇‍♀️😤",
+            "Kto zamówił halny?! 🌬️😖"
+        ]
+    },
+
+    view: {
+        johny: [
+            "Widzę wszystko. Bez okularów 🤓🔭",
+            "Zapisuję współrzędne, trzy kopie 💾🗺️",
+            "Panorama bez kompresji 📸😎"
+        ],
+        deedee: [
+            "Widok jak z Dolomitów! 🏔️😍",
+            "Zdjęcie i lecimy na lody 📸🍦",
+            "Wyślę sobie stąd pocztówkę 💌🏔️"
+        ]
+    },
+
+    ski: {
+        johny: [
+            "Akcelerator sprzętowy 🚀🎿",
+            "Kiedyś jeździłem na desce. Kiedyś ⛷️👴",
+            "Trzy pola. Wydajność nerdowska 🎿🤓"
+        ],
+        deedee: [
+            "Zjazd! Prawie jak na SUP-ie 🏄‍♀️😆",
+            "Szybciej niż na żużlu! 🏍️💨",
+            "Trzymaj się, Loki! 🐕🎿"
+        ]
+    },
+
+    shelter: {
+        johny: [
+            "Ładowanie baterii 🔋😴",
+            "Kawa i gitara, reszta czeka 🎸☕",
+            "Tu przynajmniej mają kabel ☎️👴"
+        ],
+        deedee: [
+            "Kawa. Z mlekiem. Inaczej nie idę ☕🥛",
+            "Pampuch i ruszamy 🍩😊",
+            "Loki, łapy na kanapę! 🐕😴"
+        ]
+    },
+
+    lift: {
+        johny: [
+            "Sprawdziłem nośność. Dwa razy 🤓🚡",
+            "Trzymam się. Jestem stary, nie głupi 👴🚡",
+            "Skrót w pełni zoptymalizowany 📊🚡"
+        ],
+        deedee: [
+            "Jadę gondolą, pa pa! 🚡😘",
+            "Nogi mi podziękują 🚡💅",
+            "Widok z góry — pocztówka gotowa 💌🚡"
+        ]
+    },
+
+    meta: {
+        johny: [
+            "Szczyt zdobyty. Excel się zgadzał 📊🏆",
+            "Wygrałem! Gdzie moje okulary? 🤓🏆",
+            "Zapisuję. Trzy kopie, jedna w chmurze 💾🏆"
+        ],
+        deedee: [
+            "Śnieżka moja! Teraz lody 🏆🍦",
+            "Wygrałam! Zatańczmy bachatę 💃🏆",
+            "Pocztówka ze szczytu — do siebie 💌🏔️"
+        ]
+    },
+
+    spotkanie: {
+        johny: [
+            "Ładnie dziś wyglądasz 😍💗",
+            "Zbackupowałem ten moment 💾💗",
+            "Randka na szlaku ⛰️💗"
+        ],
+        deedee: [
+            "Zatańczysz tu ze mną? 💃💗",
+            "Masz pampucha? 🍩💗",
+            "Spotkanie na szlaku 🥰💗"
+        ]
+    },
+
+    zwykle: {
+        johny: [
+            "Tempo w normie 📊",
+            "Gdzie ja mam okulary 🤓",
+            "Za moich czasów szło się szybciej 👴",
+            "Krok po kroku 🥾",
+            "Nie zmęczyłem się. Wcale ⚽"
+        ],
+        deedee: [
+            "Idziemy dalej! 🥾",
+            "Loki by tu już był 🐕",
+            "Jeszcze kawałek i lody 🍦",
+            "Ładnie tu 😊",
+            "Buty nowe, więc dam radę 🥾💅"
+        ]
     }
 };
 
