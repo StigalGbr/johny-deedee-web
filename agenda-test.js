@@ -87,6 +87,15 @@ let zlyEfekt = 0;
 });
 if (!zlyEfekt) ok("wartości efektów w agendzie zgadzają się z game.js");
 
+// --- schronisko: agenda, okno zasad i kod musza mowic to samo ---
+const kodPodwaja = /podwojone \? oczko \* 2 : oczko/.test(gameJs);
+const mdPodwaja = /liczy się \*\*×2\*\*/.test(md);
+const zasadyPodwaja = /liczy się podwójnie/.test(linesJs);
+if (!kodPodwaja) zle("game.js nie podwaja rzutu po schronisku");
+if (!mdPodwaja) zle("agenda nie opisuje schroniska jako ×2");
+if (!zasadyPodwaja) zle("okno zasad nie opisuje schroniska jako ×2");
+if (kodPodwaja && mdPodwaja && zasadyPodwaja) ok("schronisko: kod, agenda i okno zasad zgodne (×2)");
+
 // --- kazdy typ pola ma teksty dymkow ---
 const typy = [...new Set(TRASA.map((f) => f.type))].filter((t) => t !== "normal" && t !== "start");
 const bezTekstow = typy.filter((t) => !new RegExp(`\\b${t}:\\s*\\{`).test(linesJs));

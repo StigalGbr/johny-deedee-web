@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misja Vertigo</title>
-    <meta name="description" content="Odliczanie do Misji Vertigo">
+    <title>Przygody Johnny'ego &amp; Dee Dee</title>
+    <meta name="description" content="Przygody Johnny'ego i Dee Dee: gry, plan wieczoru i górska planszówka">
 
     <!-- tlo siedzi w CSS, wiec bez tego przegladarka bierze sie za nie dopiero
          po sparsowaniu arkusza - przy pierwszym wejsciu bylo widac biale tlo -->
@@ -17,7 +17,7 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -111,7 +111,7 @@
             <button class="game__back" id="game-back" type="button" hidden>◀ Menu</button>
             <span class="game__score" id="game-score"></span>
             <button class="game__rules" id="game-rules" type="button" hidden
-                aria-label="Zasady gry">? Zasady</button>
+                aria-label="Zasady gry">Zasady</button>
             <button class="game__close" id="game-close" type="button" aria-label="Zamknij grę">✕</button>
         </div>
 
@@ -158,9 +158,9 @@
     <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
     <div class="fx" id="fx" aria-hidden="true"></div>
 
-    <script src="lines.js?v=12"></script>
-    <script src="script.js?v=12"></script>
+    <script src="lines.js?v=13"></script>
+    <script src="script.js?v=13"></script>
     <script src="plansza-trasa.js?v=2"></script>
-    <script src="game.js?v=14"></script>
+    <script src="game.js?v=15"></script>
 </body>
 </html>

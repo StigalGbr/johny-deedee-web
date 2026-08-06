@@ -525,7 +525,7 @@
             view: { tekst: "+1 WIDOK 😃", nastroj: "dobry" },
             ski: { tekst: "+3 ZJAZD 🎿", nastroj: "dobry" },
             wind: { tekst: "−2 WIATR 😖", nastroj: "zly" },
-            shelter: { tekst: "RZUT 2× 😴", nastroj: "dobry" },
+            shelter: { tekst: "NASTĘPNY RZUT ×2 😴", nastroj: "dobry" },
             lift: { tekst: "WYCIĄG! 🚡", nastroj: "dobry" },
             meta: { tekst: "META! 🏆", nastroj: "dobry" },
             lawina: { tekst: "LAWINA! −10 😱", nastroj: "zly" },
@@ -574,7 +574,7 @@
             ],
             ktory: 0,              // indeks gracza, ktory teraz rzuca
             faza: "rzut",          // rzut | kreci | rusza | efekt | koniec
-            kostka: { t: 0, oczko: 1, wynik: 0, drugiRzut: 0 },
+            kostka: { t: 0, oczko: 1, wynik: 0, podwojone: false },
             ruch: null,            // stepped: {pola,krok,t,zliczEfekt,gracz} albo wyciag: {special:"wyciag",od,do,t,zliczEfekt,gracz}
             dymki: [],
             blyski: [],
@@ -730,7 +730,7 @@
             if (typ === "shelter") {
                 dymek(pole, DYMKI_POL.shelter.tekst, DYMKI_POL.shelter.nastroj);
                 gracz.podwojnyRzut = true;
-                state.opisEfektu = "schronisko: następny rzut 2× 🏠";
+                state.opisEfektu = "schronisko: następny rzut liczy się ×2 🏠";
             }
 
             zakonczRuch(gracz);
@@ -803,7 +803,7 @@
             // poprzedniej tury, bo kostka.wynik byla nadpisywana dopiero po
             // zakonczeniu animacji.
             state.kostka.wynik = 0;
-            state.kostka.drugiRzut = 0;
+            state.kostka.podwojone = false;
             state.wynikT = -1;
             state.opisEfektu = "";
         }
@@ -819,26 +819,21 @@
             if (kostka.t < limit) return;
 
             const gracz = state.gracze[state.ktory];
-            let wynik, drugi = 0;
 
-            if (wymuszonyWynik !== null) {
-                // hak testowy - pomija losowanie i zdejmuje flage schroniska tak,
-                // jakby rzut naprawde sie odbyl
-                wynik = wymuszonyWynik;
-                wymuszonyWynik = null;
-                gracz.podwojnyRzut = false;
-            } else {
-                wynik = 1 + rand(6);
-                if (gracz.podwojnyRzut) {
-                    drugi = 1 + rand(6);
-                    wynik += drugi;
-                    gracz.podwojnyRzut = false;
-                }
-            }
+            // Schronisko PODWAJA to, co wlasnie wypadlo, zamiast dokladac drugi
+            // rzut. Przy dwoch rzutach kostka pokazywala jedna scianke, a pionek
+            // szedl o sume dwoch - nie dalo sie tego powiazac wzrokiem.
+            const oczko = wymuszonyWynik !== null ? wymuszonyWynik : 1 + rand(6);
+            wymuszonyWynik = null;
+
+            const podwojone = gracz.podwojnyRzut;
+            gracz.podwojnyRzut = false;
+
+            const wynik = podwojone ? oczko * 2 : oczko;
 
             kostka.wynik = wynik;
-            kostka.drugiRzut = drugi;
-            kostka.oczko = Math.max(1, Math.min(6, drugi || wynik));
+            kostka.oczko = Math.max(1, Math.min(6, oczko));
+            kostka.podwojone = podwojone;
             state.wynikT = 0;   // liczba wyskakuje na kostce
 
             const cel = Math.min(64, gracz.pole + wynik);
@@ -1130,6 +1125,16 @@
                 ctx.strokeText(state.kostka.wynik, 0, 0);
                 ctx.fillStyle = "#ffd93b";
                 ctx.fillText(state.kostka.wynik, 0, 0);
+
+                // Przy podwojeniu kostka pokazuje inna scianke niz liczba pol,
+                // wiec dopisujemy skad ta roznica.
+                if (state.kostka.podwojone) {
+                    ctx.font = `bold ${Math.round(size * 0.26)}px "Trebuchet MS", sans-serif`;
+                    ctx.lineWidth = size * 0.07;
+                    ctx.strokeText("×2", size * 0.52, -size * 0.2);
+                    ctx.fillStyle = "#7ed957";
+                    ctx.fillText("×2", size * 0.52, -size * 0.2);
+                }
                 ctx.restore();
             }
         }
@@ -1250,16 +1255,15 @@
                 label = "Koniec gry 🏆";
             } else if (state.faza === "rzut") {
                 label = `Rzuca ${gracz.nazwa}`;
-                if (gracz.podwojnyRzut) label += " — rzut 2× 🏠";
+                if (gracz.podwojnyRzut) label += " — po schronisku rzut liczy się ×2 🏠";
             } else if (state.faza === "kreci" || !k.wynik) {
                 // w trakcie krecenia nie ma jeszcze wyniku - nie pokazujemy nic,
                 // co mogloby wygladac na liczbe z poprzedniej tury
                 label = `${gracz.nazwa} rzuca kostką…`;
             } else {
-                const ile = k.drugiRzut
-                    ? `${k.wynik - k.drugiRzut}+${k.drugiRzut} = ${k.wynik}`
-                    : `${k.wynik}`;
-                label = `${gracz.nazwa} ${gracz.rzucil} ${ile}`;
+                label = k.podwojone
+                    ? `${gracz.nazwa} ${gracz.rzucil} ${k.oczko}, schronisko podwaja → idzie ${k.wynik} pól 🏠`
+                    : `${gracz.nazwa} ${gracz.rzucil} ${k.wynik}`;
                 if (state.opisEfektu) label += `, ${state.opisEfektu}`;
             }
 

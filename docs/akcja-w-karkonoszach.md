@@ -39,7 +39,7 @@ Osiem typów, zgodnie z legendą (`pic/plansza/legend.webp`).
 | Ikona | Typ | `type` | Działanie |
 |---|---|---|---|
 | kamień | Zwykłe | `normal` | nic się nie dzieje |
-| domek | Schronisko | `shelter` | w **następnej** turze gracz rzuca 2 razy i **sumuje** wyniki |
+| domek | Schronisko | `shelter` | w **następnej** turze rzut gracza liczy się **×2** |
 | zielona strzałka | Bonus | `bonus` | **+2 pola** do przodu od razu |
 | czerwony wiatr | Przeszkoda | `wind` | **−2 pola** do tyłu |
 | niebieska lornetka | Punkt widokowy | `view` | **+1 pole** do przodu |
@@ -128,7 +128,10 @@ Podsumowanie: 1 start, 1 wyciąg, 5 schronisk, 3 bonusy, 4 wiatry,
 ## 4. Przebieg tury
 
 1. Gracz rzuca kostką **1–6**.
-   - Jeśli w poprzedniej turze skończył na **schronisku**, rzuca **dwa razy i sumuje**.
+   - Jeśli w poprzedniej turze skończył na **schronisku**, wynik liczy się **×2**
+     (rzuca 4 → idzie 8 pól). Wcześniej były to dwa rzuty i suma, ale kostka
+     pokazywała wtedy jedną ściankę, a pionek szedł o sumę dwóch — nie dało się
+     tego powiązać wzrokiem.
 2. Pionek przesuwa się o wylosowaną liczbę pól, **animowany po kolei przez pola** (nie skacze).
 3. Uruchamia się efekt pola, na którym stanął (patrz zasada z rozdziału 2).
 4. Jeśli obaj gracze stoją na tym samym polu → **animacja serduszka** (bez wpływu na zasady).
@@ -191,7 +194,7 @@ Pilnuje tego `plansza-test.js`:
 - [x] każde pole specjalne ma numer
 - [x] trasa ciągła — po każdym polu da się wskazać następne
 - [x] pole 6 (wyciąg) nie psuje normalnej numeracji
-- [x] schroniska mają zasadę rzutu 2×
+- [x] schroniska podwajają następny rzut
 - [x] końcówka 59–64 prowadzi granią na Śnieżkę
 - [x] pole 64 na szczycie przy obserwatorium
 - [x] żadne dwa pola się nie nakładają

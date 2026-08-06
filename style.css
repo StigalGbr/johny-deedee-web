@@ -833,6 +833,9 @@ body.is-nerd .bubble--johny::before {
 }
 
 .game__close {
+    /* flex-shrink: 0 jest tu kluczowe - bez niego wynik posrodku paska
+       sciskal krzyzyk z 35 px do 17 i nie dalo sie w niego trafic palcem */
+    flex: 0 0 auto;
     width: 2.2rem;
     height: 2.2rem;
     font: inherit;
@@ -981,6 +984,7 @@ body.is-nerd .bubble--johny::before {
 /* ---------- zasady gry planszowej ---------- */
 
 .game__rules {
+    flex: 0 0 auto;
     padding: 0.4rem 0.7rem;
     font: inherit;
     font-size: 0.8rem;
@@ -1285,6 +1289,34 @@ body.is-nerd .bubble--johny::before {
 
     /* na waskim ekranie plansza jest niska, wiec kafle wyboru gry musza sie
        skrocic - z opisem wychodzily poza ciemny panel */
+    /* Na telefonie w te przyciski trafia sie kciukiem w trakcie gry, wiec cel
+       dotykowy ma miec co najmniej 44 px i odstep od krawedzi ekranu. */
+    .game__bar {
+        gap: 0.5rem;
+        padding: 0 0.2rem;
+    }
+
+    .game__close {
+        width: 2.75rem;
+        height: 2.75rem;
+        font-size: 1.15rem;
+    }
+
+    .game__rules,
+    .game__back {
+        min-height: 2.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* trzy przyciski + wynik na 375 px to ciasno - imiona musza zostac
+       w jednej linii, inaczej "Dee Dee" lamie sie na dwa wiersze */
+    .game__score {
+        min-width: 0;
+        gap: 0.3rem;
+        font-size: 0.72rem;
+        white-space: nowrap;
+    }
+
     .game__menu {
         gap: 0.8rem;
     }

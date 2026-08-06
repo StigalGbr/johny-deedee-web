@@ -137,7 +137,7 @@ const ZASADY = {
     cel: "Rzucacie na zmianę kostką i idziecie polami z Karpacza na Śnieżkę. Wygrywa ten, kto pierwszy stanie na polu 64. Nie trzeba trafić dokładnie — nadmiar przepada.",
     pola: [
         { ikona: "pole-normal", nazwa: "Zwykłe pole", opis: "Nic się nie dzieje." },
-        { ikona: "pole-shelter", nazwa: "Schronisko", opis: "W następnej turze rzucasz 2× i sumujesz." },
+        { ikona: "pole-shelter", nazwa: "Schronisko", opis: "W następnej turze Twój rzut liczy się podwójnie (×2)." },
         { ikona: "pole-bonus", nazwa: "Bonus", opis: "Idziesz 2 pola do przodu." },
         { ikona: "pole-view", nazwa: "Punkt widokowy", opis: "Idziesz 1 pole do przodu." },
         { ikona: "pole-ski", nazwa: "Narciarz", opis: "Zjazd: 3 pola do przodu." },
@@ -163,40 +163,39 @@ const ZASADY = {
 const GAME_BUBBLES = {
     bonus: {
         johny: [
-            "Zoptymalizowałem trasę 📊⛰️",
-            "To przewaga technologiczna 🤓⚡",
-            "Skrót wydrukowany w 3D 🖨️😎"
+            "Wyliczyłem to na drukarce 3D 🖨️😎",
+            "Skrót jak z mapy zamku 🏰⚡",
+            "Biegam. Czasem nawet szybko 🏃‍♂️😄"
         ],
         deedee: [
             "Staruszek mnie nie złapie 👴😜",
-            "To za te spodenki! 🩳💨",
-            "Szybsza niż Loki po pampucha 🐕🍩"
+            "Szybciej niż na żużlu! 🏍️💨",
+            "Bachata mi nogi wyćwiczyła 💃⚡"
         ]
     },
 
     wind: {
         johny: [
+            "Wiatr jak na ruinach zamku 🏰🌬️",
             "Za moich czasów wiało wolniej 👴🌬️",
-            "Okulary poleciały. Znowu 🤓💨",
-            "To nie porażka, to rollback 💾😖"
+            "Gitara mi się rozstroiła 🎸😖"
         ],
         deedee: [
             "O kurczę, już go nie dogonię 😩🌬️",
             "Wiatr zniszczył mi fryzurę! 💇‍♀️😤",
-            "Kto zamówił halny?! 🌬️😖"
+            "W Dolomitach tak nie wieje 🏔️😖"
         ]
     },
 
-    // dwa pola-katastrofy - tu postacie maja prawo panikowac
     lawina: {
         johny: [
-            "Backup mam. Siebie nie 😱❄️",
-            "Za moich czasów śnieg leżał! 👴❄️",
+            "Zjazd gorszy niż w Energylandii 🎢😱",
+            "Za stary jestem na takie akcje 👴❄️",
             "Dziesięć pól. Policzyłem 📊😰"
         ],
         deedee: [
-            "Moje włosy! I moje pola! 😱💇‍♀️",
-            "Zjechałam. Nie tak to planowałam ❄️😭",
+            "Jak na kajaku, tylko bez kajaka 🛶😱",
+            "Moje włosy! I moje pola! 💇‍♀️😱",
             "Loki, ratuj mnie stąd! 🐕😰"
         ]
     },
@@ -204,8 +203,8 @@ const GAME_BUBBLES = {
     zamiec: {
         johny: [
             "Byłem trzy pola od szczytu… 🥶💔",
-            "Ktoś wyłączył mi zasilanie 🔌🥶",
-            "Wracam. Znowu. Bez okularów 🤓🥶"
+            "Zimniej niż na ściance w listopadzie 🧗🥶",
+            "Wracam. Znowu. I to na piechotę 🥶😩"
         ],
         deedee: [
             "NIE. Ja tam byłam! 🥶😭",
@@ -216,25 +215,25 @@ const GAME_BUBBLES = {
 
     view: {
         johny: [
-            "Widzę wszystko. Bez okularów 🤓🔭",
-            "Zapisuję współrzędne, trzy kopie 💾🗺️",
-            "Panorama bez kompresji 📸😎"
+            "Panorama jak z ruin zamku 🏰📸",
+            "Widok na cały mecz stąd ⚽😎",
+            "Zagrałbym tu coś na gitarze 🎸🏔️"
         ],
         deedee: [
             "Widok jak z Dolomitów! 🏔️😍",
-            "Zdjęcie i lecimy na lody 📸🍦",
-            "Wyślę sobie stąd pocztówkę 💌🏔️"
+            "Wyślę sobie stąd pocztówkę 💌🏔️",
+            "Tu bym postawiła SUP-a 🏄‍♀️😍"
         ]
     },
 
     ski: {
         johny: [
-            "Akcelerator sprzętowy 🚀🎿",
-            "Kiedyś jeździłem na desce. Kiedyś ⛷️👴",
-            "Trzy pola. Wydajność nerdowska 🎿🤓"
+            "Szybciej niż moja drukarka 🖨️🎿",
+            "Kiedyś jeździłem. Kiedyś ⛷️👴",
+            "Zjazd jak kontra w piłce ⚽💨"
         ],
         deedee: [
-            "Zjazd! Prawie jak na SUP-ie 🏄‍♀️😆",
+            "Jak spływ kajakiem, tylko po śniegu 🛶🎿",
             "Szybciej niż na żużlu! 🏍️💨",
             "Trzymaj się, Loki! 🐕🎿"
         ]
@@ -242,35 +241,35 @@ const GAME_BUBBLES = {
 
     shelter: {
         johny: [
-            "Ładowanie baterii 🔋😴",
-            "Kawa i gitara, reszta czeka 🎸☕",
-            "Tu przynajmniej mają kabel ☎️👴"
+            "Wyciągam gitarę, siadamy 🎸☕",
+            "Nogi swoje odbiegały 🏃‍♂️😴",
+            "Labrador by tu został na zawsze 🐕😴"
         ],
         deedee: [
             "Kawa. Z mlekiem. Inaczej nie idę ☕🥛",
-            "Pampuch i ruszamy 🍩😊",
-            "Loki, łapy na kanapę! 🐕😴"
+            "Zaśpiewajmy Stare Dobre Małżeństwo 🎶😊",
+            "Poszukam tu blatów do kuchni 🔨😄"
         ]
     },
 
     lift: {
         johny: [
             "Sprawdziłem nośność. Dwa razy 🤓🚡",
-            "Trzymam się. Jestem stary, nie głupi 👴🚡",
-            "Skrót w pełni zoptymalizowany 📊🚡"
+            "Wolę to niż ściankę wspinaczkową 🧗🚡",
+            "Siadam. Nogi mają wolne 👴🚡"
         ],
         deedee: [
             "Jadę gondolą, pa pa! 🚡😘",
-            "Nogi mi podziękują 🚡💅",
-            "Widok z góry — pocztówka gotowa 💌🚡"
+            "Widok z góry — pocztówka gotowa 💌🚡",
+            "Jak kolejka w Energylandii! 🎢😆"
         ]
     },
 
     meta: {
         johny: [
-            "Szczyt zdobyty. Excel się zgadzał 📊🏆",
-            "Wygrałem! Gdzie moje okulary? 🤓🏆",
-            "Zapisuję. Trzy kopie, jedna w chmurze 💾🏆"
+            "Szczyt zdobyty. Zagram wam marsza 🎸🏆",
+            "Wygrałem! I to bez wyciągu 💪🏆",
+            "Gol w ostatniej minucie ⚽🏆"
         ],
         deedee: [
             "Śnieżka moja! Teraz lody 🏆🍦",
@@ -281,31 +280,31 @@ const GAME_BUBBLES = {
 
     spotkanie: {
         johny: [
-            "Ładnie dziś wyglądasz 😍💗",
-            "Zbackupowałem ten moment 💾💗",
+            "Jak na tym koncercie Amy 🎤💗",
+            "Zaśpiewam ci, jak wtedy 🎸💗",
             "Randka na szlaku ⛰️💗"
         ],
         deedee: [
             "Zatańczysz tu ze mną? 💃💗",
-            "Masz pampucha? 🍩💗",
-            "Spotkanie na szlaku 🥰💗"
+            "Pamiętasz ten koncert Amy? 🎤💗",
+            "Płyniemy latem kajakiem, tak? 🛶💗"
         ]
     },
 
     zwykle: {
         johny: [
-            "Tempo w normie 📊",
-            "Gdzie ja mam okulary 🤓",
+            "Tempo w normie ⚽",
+            "Nogi jeszcze niosą 🏃‍♂️",
             "Za moich czasów szło się szybciej 👴",
-            "Krok po kroku 🥾",
-            "Nie zmęczyłem się. Wcale ⚽"
+            "Zaśpiewałbym coś 🎸",
+            "Krok po kroku 🥾"
         ],
         deedee: [
             "Idziemy dalej! 🥾",
             "Loki by tu już był 🐕",
+            "W Dolomitach będzie lepiej 🏔️",
             "Jeszcze kawałek i lody 🍦",
-            "Ładnie tu 😊",
-            "Buty nowe, więc dam radę 🥾💅"
+            "A latem kajaki 🛶"
         ]
     }
 };
