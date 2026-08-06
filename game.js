@@ -564,6 +564,14 @@
         };
 
         const easeOut = (p) => 1 - Math.pow(1 - p, 3);
+
+        // 1 pole, 2-4 pola, 5+ pol - bez tego pasek pisal "idzie 4 pól"
+        function odmianaPol(n) {
+            if (n === 1) return "pole";
+            const jed = n % 10;
+            const dwie = n % 100;
+            return jed >= 2 && jed <= 4 && !(dwie >= 12 && dwie <= 14) ? "pola" : "pól";
+        }
         const reducedMotion = () => window.matchMedia
             && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -730,7 +738,7 @@
             if (typ === "shelter") {
                 dymek(pole, DYMKI_POL.shelter.tekst, DYMKI_POL.shelter.nastroj);
                 gracz.podwojnyRzut = true;
-                state.opisEfektu = "schronisko: następny rzut liczy się ×2 🏠";
+                state.opisEfektu = "następny rzut ×2 🏠";
             }
 
             zakonczRuch(gracz);
@@ -1255,14 +1263,14 @@
                 label = "Koniec gry 🏆";
             } else if (state.faza === "rzut") {
                 label = `Rzuca ${gracz.nazwa}`;
-                if (gracz.podwojnyRzut) label += " — po schronisku rzut liczy się ×2 🏠";
+                if (gracz.podwojnyRzut) label += " — rzut ×2 🏠";
             } else if (state.faza === "kreci" || !k.wynik) {
                 // w trakcie krecenia nie ma jeszcze wyniku - nie pokazujemy nic,
                 // co mogloby wygladac na liczbe z poprzedniej tury
                 label = `${gracz.nazwa} rzuca kostką…`;
             } else {
                 label = k.podwojone
-                    ? `${gracz.nazwa} ${gracz.rzucil} ${k.oczko}, schronisko podwaja → idzie ${k.wynik} pól 🏠`
+                    ? `${gracz.nazwa} ${gracz.rzucil} ${k.oczko} ×2 = ${k.wynik} ${odmianaPol(k.wynik)} 🏠`
                     : `${gracz.nazwa} ${gracz.rzucil} ${k.wynik}`;
                 if (state.opisEfektu) label += `, ${state.opisEfektu}`;
             }

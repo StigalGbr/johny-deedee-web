@@ -1131,6 +1131,11 @@ body.is-nerd .bubble--johny::before {
 }
 
 .dice__roll {
+    /* Bez tego dlugi komunikat obok zabieral szerokosc, napis "Rzuć kostką"
+       zawijal sie w srodku przycisku i rozpychal go z 46 na 88 px - a razem
+       z nim przesuwala sie cala plansza. */
+    flex: 0 0 auto;
+    white-space: nowrap;
     padding: 0.6rem 1.3rem;
     font: inherit;
     font-size: 1rem;
@@ -1155,6 +1160,7 @@ body.is-nerd .bubble--johny::before {
 }
 
 .dice__who {
+    min-width: 0;
     font-size: 0.9rem;
     font-weight: 700;
     color: #fff;
@@ -1315,6 +1321,22 @@ body.is-nerd .bubble--johny::before {
         gap: 0.3rem;
         font-size: 0.72rem;
         white-space: nowrap;
+    }
+
+    /* Na telefonie komunikat idzie pod przycisk, a nie obok - w jednym rzedzie
+       nie miesci sie ani jedno, ani drugie. Staly min-height rezerwuje miejsce
+       na dwa wiersze, zeby plansza nie skakala przy kazdej zmianie tekstu. */
+    .dice {
+        flex-direction: column;
+        gap: 0.35rem;
+        width: min(900px, 94vw, 60vh);
+    }
+
+    .dice__who {
+        min-height: 2.5em;
+        font-size: 0.78rem;
+        line-height: 1.25;
+        text-align: center;
     }
 
     .game__menu {
