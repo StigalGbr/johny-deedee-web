@@ -1,298 +1,202 @@
 # Akcja w Karkonoszach: Johnny i Dee Dee na Śnieżkę
 
-## 1. Opis ogólny gry
+Gra planszowa dla 2 graczy. Johnny Bravo i Dee Dee startują w Karpaczu i ścigają
+się przez Karkonosze na szczyt Śnieżki. Wygrywa ten, kto pierwszy stanie na polu 64.
+
+> **Ten plik jest źródłem prawdy dla zasad.** Każda zmiana pola albo reguły ma
+> tu trafić od razu, zanim wejdzie do kodu — inaczej ustalenia uciekną.
+
+---
+
+## 1. Stan na dziś
+
+| Element | Stan |
+|---|---|
+| Plansza (tło) | gotowe — `pic/plansza/board.webp` |
+| 64 pola: pozycje i typy | gotowe — `plansza-trasa.js` |
+| Grafiki pól (8 typów) | gotowe — `pic/plansza/pole-*.webp` |
+| Pionki | gotowe — `pic/plansza/pawn-johny.webp`, `pawn-deedee.webp` |
+| Testy planszy | gotowe — `plansza-test.js` |
+| Podgląd na stronie | gotowe — kafel „Górska przygoda” w menu gier |
+| **Mechanika gry** | **do zrobienia** |
+
+Numer pola to **indeks w tablicy + 1** i nigdzie nie jest zapisany ręcznie.
+Dlatego duplikat numeru albo luka są strukturalnie niemożliwe. Tak wykłada się
+poprzednia plansza, gdzie numery były wypalone w obrazku: numer 50 występował
+trzy razy, 13 trzy razy, a brakowało m.in. 12, 33 i 46.
+
+Kontrola: `node plansza-test.js` — 13 punktów listy kontrolnej (64 pola,
+ciągłość trasy, brak nachodzenia pól, wyciąg nie wycina pól z numeracji).
+
+---
+
+## 2. Typy pól i ich działanie
+
+Osiem typów, zgodnie z legendą (`pic/plansza/legend.webp`).
+
+| Ikona | Typ | `type` | Działanie |
+|---|---|---|---|
+| kamień | Zwykłe | `normal` | nic się nie dzieje |
+| domek | Schronisko | `shelter` | w **następnej** turze gracz rzuca 2 razy i **sumuje** wyniki |
+| zielona strzałka | Bonus | `bonus` | **+2 pola** do przodu od razu |
+| czerwony wiatr | Przeszkoda | `wind` | **−2 pola** do tyłu |
+| niebieska lornetka | Punkt widokowy | `view` | **+1 pole** do przodu |
+| pomarańczowy narciarz | Narciarz | `ski` | **+3 pola** do przodu (szybki zjazd) |
+| różowe serce | Serduszko | `start` | pole startowe; animacja przy spotkaniu graczy |
+| złoty puchar | Meta | `meta` | koniec gry, zwycięstwo |
+| — | Wyciąg | `lift` | przenosi z pola **6** na pole **27** |
+
+### Zasada, która ucina pętle
+
+**Efekt pola uruchamia się tylko wtedy, gdy gracz stanął na nim rzutem kostki.**
+Jeśli trafił tam przez cudzy efekt (bonus, wiatr, narciarz, wyciąg) — pole
+milczy. Bez tego bonus obok bonusu potrafiłby zapętlić ruch w nieskończoność.
+
+Wyciąg **nie zmienia numeracji planszy** — normalna trasa dalej biegnie
+6 → 7 → 8 → … → 27. Wyciąg to tylko skrót.
+
+---
+
+## 3. Co jest na którym polu
+
+43 pola są zwykłe, 21 ma efekt. Pełna lista:
+
+| Pole | Typ | Miejsce / uwagi |
+|---|---|---|
+| **1** | 💗 START | **START: Karpacz** |
+| 2–3 | zwykłe | dolna łąka |
+| **4** | 🌬️ wiatr | |
+| 5 | zwykłe | |
+| **6** | 🚡 **WYCIĄG** | **Wyciąg na Kopę → przenosi na pole 27** |
+| 7–8 | zwykłe | |
+| **9** | 🔭 widok | |
+| 10–11 | zwykłe | prawa krawędź w górę |
+| **12** | ➡️ bonus | |
+| 13–14 | zwykłe | |
+| **15** | 🌬️ wiatr | |
+| 16–22 | zwykłe | trawers w lewo |
+| **23** | 🏠 schronisko | **Strzecha Akademicka** |
+| 24–25 | zwykłe | |
+| **26** | 🌬️ wiatr | |
+| 27 | zwykłe | **górna stacja wyciągu** (tu ląduje skrót z pola 6) |
+| **28** | 🏠 schronisko | **Schronisko Samotnia** (Mały Staw) |
+| 29–31 | zwykłe | podejście w górę |
+| **32** | 🏠 schronisko | **Schronisko na Hali Szrenickiej** |
+| 33 | zwykłe | |
+| **34** | ⛷️ narciarz | |
+| 35 | zwykłe | |
+| **36** | 🔭 widok | **Szrenica** |
+| 37–39 | zwykłe | zejście w lewo |
+| **40** | ➡️ bonus | **Wodospad Kamieńczyka** (tu trasa zawraca w górę) |
+| 41–42 | zwykłe | lewa krawędź w górę |
+| **43** | 🔭 widok | **Przełęcz Karkonoska** |
+| 44–46 | zwykłe | |
+| **47** | 🔭 widok | **Śnieżne Kotły** |
+| 48–50 | zwykłe | trawers w prawo |
+| **51** | 🏠 schronisko | **Schronisko Odrodzenie** |
+| 52 | zwykłe | |
+| **53** | ➡️ bonus | |
+| 54 | zwykłe | |
+| **55** | 🌬️ wiatr | |
+| 56–57 | zwykłe | |
+| **58** | 🏠 schronisko | **Dom Śląski pod Śnieżką** |
+| 59 | zwykłe | początek podejścia z łańcuchami |
+| **60** | 🌬️ wiatr | najbardziej wietrzne miejsce na grani |
+| 61–63 | zwykłe | strome podejście granią |
+| **64** | 🏆 META | **META: ŚNIEŻKA** — przy obserwatorium |
 
-**Akcja w Karkonoszach: Johnny i Dee Dee na Śnieżkę** to internetowa gra planszowa dla 2 graczy. Gracze wcielają się w Johnny’ego Bravo i Dee Dee, którzy startują w Karpaczu i ścigają się przez najważniejsze miejsca Karkonoszy aż na szczyt Śnieżki.
+Podsumowanie: 1 start, 1 wyciąg, 5 schronisk, 3 bonusy, 5 wiatrów,
+4 punkty widokowe, 1 narciarz, 1 meta, 43 zwykłe.
 
-Plansza ma formę kreskówkowej mapy górskiej. Trasa prowadzi przez lasy, schroniska, wodospad, szczyty, przełęcze i finałowe strome podejście z łańcuchami na Śnieżkę. Gra ma być lekka, dynamiczna, zabawna i wizualnie podobna do kolorowej kreskówki z grubymi czarnymi konturami.
+---
 
-## 2. Cel gry
+## 4. Przebieg tury
 
-Celem gry jest dotarcie jako pierwszy na pole **64 — META: ŚNIEŻKA**.
+1. Gracz rzuca kostką **1–6**.
+   - Jeśli w poprzedniej turze skończył na **schronisku**, rzuca **dwa razy i sumuje**.
+2. Pionek przesuwa się o wylosowaną liczbę pól, **animowany po kolei przez pola** (nie skacze).
+3. Uruchamia się efekt pola, na którym stanął (patrz zasada z rozdziału 2).
+4. Jeśli obaj gracze stoją na tym samym polu → **animacja serduszka** (bez wpływu na zasady).
+5. Tura przechodzi na drugiego gracza.
 
-Gracz, który jako pierwszy stanie na polu 64, wygrywa grę.
+### Przypadki brzegowe
 
-## 3. Liczba pól
+- **Meta:** wynik ≥ 64 kończy grę. Nie trzeba trafić dokładnie — nadmiar przepada.
+- **Cofanie poniżej pola 1:** wiatr na polu 4 nie może zepchnąć poniżej 1 → minimum to pole 1.
+- **Wiatr blisko mety:** cofa normalnie, gra się nie kończy.
+- **Kto zaczyna:** losowo.
 
-Plansza ma dokładnie **64 pola**.
+---
 
-Najważniejsza zasada techniczna:
+## 5. Co musi powstać w aplikacji
 
-- każde pole musi mieć numer,
-- pola funkcyjne również są liczone jako normalne pola,
-- numeracja idzie kolejno od 1 do 64,
-- nie może być brakujących numerów,
-- nie może być powtórzonych numerów,
-- następne pole na normalnej trasie ma numer większy o 1,
-- poprzednie pole ma numer mniejszy o 1.
+Kolejność od dołu do góry — każdy punkt da się obejrzeć zanim ruszy następny.
 
-Efekty specjalne, takie jak wyciąg albo bonus, mogą powodować przeskok w grze, ale nie zmieniają normalnej numeracji planszy.
+**1. Rysowanie planszy**
+Tło + 64 pola z `plansza-trasa.js` na canvasie, skalowane do szerokości panelu.
+Współrzędne są ułamkami, więc działa na każdym ekranie.
 
-Przykład: jeśli pole 6 daje bonus wyciągu, gracz może przeskoczyć dalej, ale na planszy nadal istnieje normalna ścieżka:
+**2. Pionki**
+Dwa pionki na polu 1, z odsunięciem, żeby się nie zasłaniały, gdy stoją na tym
+samym polu.
 
-**6 → 7 → 8 → 9 → 10**
+**3. Kostka**
+Przycisk rzutu + widoczny wynik. Blokada w trakcie animacji ruchu, żeby nie dało
+się rzucić dwa razy.
 
-## 4. Start i meta
+**4. Ruch pionka**
+Animacja pole po polu wzdłuż trasy. Wyciąg z 6 na 27 — osobna animacja wzdłuż
+linii kolejki, nie przez pola pośrednie.
 
-### Start
+**5. Efekty pól**
+Rozstrzyganie z rozdziału 2 + flaga `podwojnyRzut` dla schronisk.
 
-Gra zaczyna się na polu **1 — START: KARPACZ**.
+**6. Stan tury i koniec gry**
+Kto teraz gra, ekran zwycięstwa, „jeszcze raz”.
 
-Pole 1 może być oznaczone serduszkiem albo specjalnym polem startowym. Jest normalnym polem gry i musi mieć numer 1.
+**7. Wpięcie w menu**
+Kafel „Górska przygoda” zamienia okno z podglądem na prawdziwy tryb gry —
+wtedy znika plakietka „w przygotowaniu”.
 
-### Meta
+### Stan gry — szkic
 
-Gra kończy się na polu **64 — META: ŚNIEŻKA**.
+```js
+const gracz = {
+    pole: 1,              // 1..64
+    podwojnyRzut: false   // ustawia schronisko, zdejmuje sie po uzyciu
+};
+```
 
-Pole 64 powinno znajdować się na samym szczycie Śnieżki, obok charakterystycznego obserwatorium. Może być oznaczone złotym polem z pucharem.
+Animacja ruchu musi liczyć czas tak samo jak reszta gier w `game.js`: stały krok
+1/60 s z akumulatorem, nie skalowanie jednym `dt`. Inaczej na słabszym PC pionek
+będzie się wlókł przy zaciętych klatkach.
 
-## 5. Główna trasa planszy
+---
 
-Trasa jest inspirowana Karkonoszami, ale nie musi być w pełni realistyczna geograficznie. Może być lekko fantazyjna i planszówkowa, ważne jednak, żeby zawierała charakterystyczne miejsca regionu.
+## 6. Wymagania na planszę (spełnione)
 
-Proponowany przebieg:
+Pilnuje tego `plansza-test.js`:
 
-1. **Karpacz — start**
-2. **Dolna stacja / wyciąg narciarski**
-3. **Świątynia Wang**
-4. **Leśne podejście**
-5. **Mały Staw**
-6. **Schronisko Samotnia**
-7. **Strzecha Akademicka**
-8. **Hala Szrenicka**
-9. **Szrenica**
-10. **Wodospad Kamieńczyka**
-11. **Przełęcz Karkonoska**
-12. **Schronisko Odrodzenie**
-13. **Śnieżne Kotły**
-14. **Dom Śląski pod Śnieżką**
-15. **Finałowe podejście z łańcuchami**
-16. **Śnieżka — meta**
+- [x] dokładnie 64 pola
+- [x] wszystkie numery 1–64, bez luk i bez duplikatów
+- [x] każde pole specjalne ma numer
+- [x] trasa ciągła — po każdym polu da się wskazać następne
+- [x] pole 6 (wyciąg) nie psuje normalnej numeracji
+- [x] schroniska mają zasadę rzutu 2×
+- [x] końcówka 59–64 prowadzi granią na Śnieżkę
+- [x] pole 64 na szczycie przy obserwatorium
+- [x] żadne dwa pola się nie nakładają
+- [x] pola nie zasłaniają tabliczek z nazwami miejsc
 
-## 6. Podział pól według odcinków
+---
 
-### Pola 1–10: Karpacz, start i wyciąg
+## 7. Styl grafiki
 
-Ten fragment znajduje się na dole planszy.
+Kreskówkowo, grube czarne kontury, żywe kolory: zielone lasy, skaliste granie,
+śnieg na szczycie, drewniane schroniska, wyciąg, wodospad, obserwatorium na
+Śnieżce. Pola pochodzą z legendy, więc trzymają ten sam styl co reszta planszy.
 
-- **1** — START: KARPACZ / serduszko startowe
-- **2–5** — pierwsze pola szlaku
-- **6** — zielona strzałka / wyciąg narciarski
-- **7–9** — dojście do dalszego szlaku
-- **10** — początek właściwego podejścia górskiego
-
-Pole 6 ma specjalny efekt: jeśli gracz stanie na nim, może skorzystać z wyciągu i przeskoczyć na wyższe pole, np. w okolice pola 20–24. Dokładne pole docelowe powinien ustalić agent kodujący.
-
-### Pola 11–24: Świątynia Wang i leśne podejście
-
-Ten fragment powinien prowadzić przez dolny i środkowy las oraz okolice Świątyni Wang.
-
-W tym odcinku można umieścić:
-
-- zwykłe pola kamienne,
-- jedno pole czerwone z wiatrem,
-- jedno pole niebieskie z lornetką lub punktem widokowym,
-- jedno pole schroniskowe/domkowe, jeśli pasuje do kompozycji.
-
-Numeracja musi iść po kolei:
-
-**11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24**
-
-### Pola 25–34: Mały Staw, Samotnia i Strzecha Akademicka
-
-Ten odcinek jest bardziej malowniczy i powinien przebiegać obok Małego Stawu oraz schronisk.
-
-Ważne pola:
-
-- okolice **Małego Stawu**,
-- **Schronisko Samotnia**,
-- **Strzecha Akademicka**.
-
-Schroniska są polami specjalnymi. Jeśli gracz zatrzyma się na polu schroniska, w następnej turze rzuca dwa razy.
-
-### Pola 35–44: Hala Szrenicka, Szrenica i Wodospad Kamieńczyka
-
-Ten fragment może być bardziej dynamiczny i wietrzny.
-
-Powinny pojawić się:
-
-- **Hala Szrenicka**,
-- **Szrenica**,
-- **Wodospad Kamieńczyka**,
-- pole z wiatrem,
-- pole narciarza lub bonusu ruchu.
-
-Na Hali Szrenickiej mocno wieje, więc można zastosować dodatkową zasadę: jeśli gracz stanie na polu wiatru przy Hali Szrenickiej, traci jedną turę albo cofa się o wskazaną liczbę pól.
-
-### Pola 45–52: Odrodzenie, Śnieżne Kotły i grań
-
-Ten fragment prowadzi wyżej w góry, przez bardziej skalisty teren.
-
-Ważne lokacje:
-
-- **Przełęcz Karkonoska**,
-- **Schronisko Odrodzenie**,
-- **Śnieżne Kotły**.
-
-Tutaj można umieścić pola widokowe z lornetką oraz pola przeszkód związane z wiatrem albo trudnym szlakiem.
-
-### Pola 53–64: Dom Śląski i finałowe podejście na Śnieżkę
-
-To końcowy, najbardziej emocjonujący fragment planszy.
-
-- **53–58** — okolice Domu Śląskiego i dojście pod Śnieżkę
-- **59–63** — strome końcowe podejście kamienną ścieżką z łańcuchami
-- **64** — META: ŚNIEŻKA, złote pole z pucharem przy obserwatorium
-
-Ostatnie 3–5 pól powinno wyglądać jak finałowa wspinaczka: skały, śnieg, słupki, łańcuchy i wyraźne podejście pod górę.
-
-## 7. Rodzaje pól
-
-### Zwykłe pole
-
-Beżowe lub kamienne pole z numerem.
-
-Efekt: brak specjalnego działania. Gracz zatrzymuje się i czeka na następną turę.
-
-### Schronisko
-
-Pole z ikoną domku/schroniska.
-
-Efekt: gracz, który zatrzyma się na tym polu, w następnej turze rzuca dwa razy. Wyniki mogą się sumować albo można pozwolić graczowi wybrać lepszy wynik — decyzja dla agenta kodującego.
-
-### Zielona strzałka / bonus
-
-Pole z zieloną strzałką.
-
-Efekt: gracz przesuwa się dodatkowo do przodu albo korzysta ze skrótu.
-
-Najważniejszy przykład: pole 6 przy wyciągu. Jeśli gracz stanie na polu 6, jedzie wyciągiem i przeskakuje na wyższe pole.
-
-### Czerwony wiatr / przeszkoda
-
-Pole czerwone z ikoną wiatru.
-
-Efekt przykładowy:
-
-- cofnięcie o 2 pola,
-- strata kolejki,
-- albo konieczność rzutu dodatkowego: niski wynik oznacza cofnięcie, wysoki wynik oznacza brak kary.
-
-### Niebieska lornetka / punkt widokowy
-
-Pole niebieskie z lornetką.
-
-Efekt przykładowy:
-
-- gracz podziwia widok i może podejrzeć kolejny efekt na trasie,
-- albo otrzymuje mały bonus, np. +1 pole.
-
-### Pomarańczowy narciarz
-
-Pole pomarańczowe z narciarzem.
-
-Efekt przykładowy:
-
-- szybki zjazd: gracz przesuwa się o kilka pól do przodu,
-- albo ryzykowny zjazd: dodatkowy rzut decyduje, czy gracz jedzie do przodu, czy cofa się.
-
-### Serduszko
-
-Pole serca może oznaczać start albo efekt spotkania graczy.
-
-Główna zasada spotkania: jeśli Johnny i Dee Dee staną na tym samym polu, na ekranie pojawia się animacja serduszka.
-
-### Meta / puchar
-
-Pole 64 z pucharem.
-
-Efekt: zakończenie gry i zwycięstwo gracza.
-
-## 8. Zasady ruchu
-
-1. Gracz rzuca wirtualną kostką od 1 do 6.
-2. Pionek przesuwa się o wylosowaną liczbę pól.
-3. Po zatrzymaniu się na polu wykonywany jest efekt tego pola.
-4. Jeśli gracz stanie na schronisku, w następnej turze rzuca dwa razy.
-5. Jeśli gracz stanie na zielonej strzałce, wykonuje bonusowy ruch zgodnie z opisem pola.
-6. Jeśli gracz stanie na czerwonym wietrze, wykonuje karę zgodnie z opisem pola.
-7. Jeśli obaj gracze znajdą się na tym samym polu, pojawia się animacja serduszka.
-8. Wygrywa gracz, który pierwszy dotrze na pole 64.
-
-## 9. Sugestia zasad specjalnych dla agenta kodującego
-
-### Schroniska
-
-Pole typu `shelter`:
-
-- ustawia flagę `doubleRollNextTurn = true`,
-- w następnej turze gracz rzuca dwa razy,
-- po wykorzystaniu bonusu flaga wraca do `false`.
-
-### Wyciąg
-
-Pole typu `lift`:
-
-- przykład: pole 6 przenosi gracza na wyższe pole, np. 22 albo 24,
-- ruch wyciągiem powinien być animowany wzdłuż linii wyciągu.
-
-### Spotkanie graczy
-
-Jeśli `playerA.position === playerB.position`:
-
-- uruchom animację serca,
-- animacja nie musi zmieniać zasad ruchu,
-- może być tylko efektem wizualnym.
-
-### Meta
-
-Jeśli `player.position >= 64`:
-
-- ustaw pozycję na 64,
-- zakończ grę,
-- pokaż zwycięstwo.
-
-## 10. Wymagania graficzne planszy
-
-Plansza powinna być w stylu kreskówkowym:
-
-- żywe kolory,
-- grube czarne kontury,
-- zielone lasy,
-- skaliste góry,
-- śnieg na szczytach,
-- drewniane schroniska,
-- wyciąg narciarski,
-- wodospad,
-- obserwatorium na Śnieżce,
-- humorystyczny, dynamiczny klimat.
-
-Jeśli plansza jest generowana bez pól, powinna zawierać samo tło z lokacjami i miejscem na ręczne wstawienie pól.
-
-Jeśli plansza jest generowana z polami, musi spełniać rygor numeracji:
-
-- dokładnie 64 pola,
-- wszystkie pola ponumerowane,
-- każde pole specjalne ma numer,
-- brak duplikatów,
-- brak luk,
-- ciągła trasa od pola 1 do pola 64.
-
-## 11. Lista kontrolna przed finalnym użyciem planszy
-
-Przed przekazaniem grafiki do kodowania należy sprawdzić:
-
-- [ ] Czy na planszy jest dokładnie 64 pól?
-- [ ] Czy są wszystkie numery od 1 do 64?
-- [ ] Czy żaden numer się nie powtarza?
-- [ ] Czy każde pole specjalne ma numer?
-- [ ] Czy trasa jest ciągła i intuicyjna?
-- [ ] Czy po każdym polu można wskazać następne sąsiadujące pole?
-- [ ] Czy pole 6 jako wyciąg nie psuje normalnej numeracji?
-- [ ] Czy schroniska mają przypisaną zasadę rzutu 2x?
-- [ ] Czy końcówka 59–64 prowadzi do Śnieżki?
-- [ ] Czy pole 64 znajduje się na szczycie przy obserwatorium?
-
-## 12. Skrócony opis dla kodera
-
-Gra planszowa online dla 2 graczy. Gracze poruszają się po polach 1–64. Każda tura to losowanie liczby 1–6 i przesunięcie pionka. Pola specjalne uruchamiają efekty: schronisko daje następny rzut 2x, wyciąg/strzałka daje skrót lub bonusowy ruch, wiatr daje karę, lornetka daje bonus widokowy, narciarz daje szybki ruch, spotkanie graczy na tym samym polu pokazuje serduszko. Wygrywa pierwszy gracz na polu 64 — Śnieżka.
+Trasa jest inspirowana Karkonoszami, ale nie trzyma się geografii co do metra —
+kolejność miejsc wynika z tego, gdzie faktycznie są namalowane na planszy.
+Dlatego Świątynia Wang jest scenerią, a nie polem: leży w lewym dolnym rogu i
+wciągnięcie jej do trasy zmusiłoby wężyk do zawracania przez pół planszy.
