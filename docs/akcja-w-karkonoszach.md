@@ -17,8 +17,10 @@ się przez Karkonosze na szczyt Śnieżki. Wygrywa ten, kto pierwszy stanie na p
 | Grafiki pól (8 typów) | gotowe — `pic/plansza/pole-*.webp` |
 | Pionki | gotowe — `pic/plansza/pawn-johny.webp`, `pawn-deedee.webp` |
 | Testy planszy | gotowe — `plansza-test.js` |
-| Podgląd na stronie | gotowe — kafel „Górska przygoda” w menu gier |
-| **Mechanika gry** | **do zrobienia** |
+| Kafel w menu gier | gotowe — „Górska przygoda” |
+| Mechanika gry | gotowe — tryb `gorska` w `game.js` |
+| Dymki postaci | gotowe — `GAME_BUBBLES` w `lines.js` |
+| Zasady w grze | gotowe — przycisk „? Zasady”, treść w `ZASADY` w `lines.js` |
 
 Numer pola to **indeks w tablicy + 1** i nigdzie nie jest zapisany ręcznie.
 Dlatego duplikat numeru albo luka są strukturalnie niemożliwe. Tak wykłada się
@@ -45,6 +47,17 @@ Osiem typów, zgodnie z legendą (`pic/plansza/legend.webp`).
 | różowe serce | Serduszko | `start` | pole startowe; animacja przy spotkaniu graczy |
 | złoty puchar | Meta | `meta` | koniec gry, zwycięstwo |
 | — | Wyciąg | `lift` | przenosi z pola **6** na pole **27** |
+| granatowy wiatr | **Lawina** | `lawina` | **cofa o 10 pól** |
+| fioletowy wiatr | **Zamieć** | `zamiec` | **zrzuca aż na pole 28** (Samotnia) |
+
+Dwa ostatnie to **pola-katastrofy** — mają boleć. Nie ma ich w legendzie
+(`pic/plansza/legend.webp`), więc grafiki powstały z pola wiatru przez zmianę
+odcienia na zimniejszy i ciemniejszy: ta sama forma, ale od razu widać, że
+gorsza. Ich parametry siedzą w `KATASTROFY` w `plansza-trasa.js`.
+
+Przy takich cofnięciach pionek jedzie przez wszystkie pola po drodze, ale
+**szybszym krokiem** (`KROK_KLATEK_SZYBKI`) — w normalnym tempie zjazd z pola
+60 na 28 trwałby 13 sekund.
 
 ### Zasada, która ucina pętle
 
@@ -90,7 +103,9 @@ Wyciąg **nie zmienia numeracji planszy** — normalna trasa dalej biegnie
 | **40** | ➡️ bonus | **Wodospad Kamieńczyka** (tu trasa zawraca w górę) |
 | 41–42 | zwykłe | lewa krawędź w górę |
 | **43** | 🔭 widok | **Przełęcz Karkonoska** |
-| 44–46 | zwykłe | |
+| 44 | zwykłe | |
+| **45** | ❄️ **LAWINA** | **Lawina w Śnieżnych Kotłach — cofa o 10 pól, na 35** |
+| 46 | zwykłe | |
 | **47** | 🔭 widok | **Śnieżne Kotły** |
 | 48–50 | zwykłe | trawers w prawo |
 | **51** | 🏠 schronisko | **Schronisko Odrodzenie** |
@@ -101,12 +116,12 @@ Wyciąg **nie zmienia numeracji planszy** — normalna trasa dalej biegnie
 | 56–57 | zwykłe | |
 | **58** | 🏠 schronisko | **Dom Śląski pod Śnieżką** |
 | 59 | zwykłe | początek podejścia z łańcuchami |
-| **60** | 🌬️ wiatr | najbardziej wietrzne miejsce na grani |
+| **60** | 🥶 **ZAMIEĆ** | **Trzy kroki od szczytu — zrzuca aż do Samotni, na 28** |
 | 61–63 | zwykłe | strome podejście granią |
 | **64** | 🏆 META | **META: ŚNIEŻKA** — przy obserwatorium |
 
-Podsumowanie: 1 start, 1 wyciąg, 5 schronisk, 3 bonusy, 5 wiatrów,
-4 punkty widokowe, 1 narciarz, 1 meta, 43 zwykłe.
+Podsumowanie: 1 start, 1 wyciąg, 5 schronisk, 3 bonusy, 4 wiatry,
+4 punkty widokowe, 1 narciarz, **1 lawina, 1 zamieć**, 1 meta, 42 zwykłe.
 
 ---
 
@@ -128,37 +143,24 @@ Podsumowanie: 1 start, 1 wyciąg, 5 schronisk, 3 bonusy, 5 wiatrów,
 
 ---
 
-## 5. Co musi powstać w aplikacji
+## 5. Gdzie co siedzi
 
-Kolejność od dołu do góry — każdy punkt da się obejrzeć zanim ruszy następny.
+| Co | Gdzie |
+|---|---|
+| 64 pola: pozycje, typy, nazwy | `plansza-trasa.js` → `TRASA` |
+| wyciąg i pola-katastrofy | `plansza-trasa.js` → `WYCIAG`, `KATASTROFY` |
+| cała mechanika (tryb `gorska`) | `game.js` |
+| teksty dymków postaci | `lines.js` → `GAME_BUBBLES` |
+| treść okna „? Zasady” | `lines.js` → `ZASADY` |
+| nazwa kafla, podpowiedź | `lines.js` → `GAME_TEXTS.gorska` |
+| grafiki pól i pionków | `pic/plansza/` |
+| testy planszy | `plansza-test.js` |
 
-**1. Rysowanie planszy**
-Tło + 64 pola z `plansza-trasa.js` na canvasie, skalowane do szerokości panelu.
-Współrzędne są ułamkami, więc działa na każdym ekranie.
+**Zmiana reguły idzie najpierw tutaj, potem do kodu.** Wartości efektów są w
+jednym miejscu w `game.js` (`rozstrzygnijEfekt`), a parametry katastrof
+w `KATASTROFY`.
 
-**2. Pionki**
-Dwa pionki na polu 1, z odsunięciem, żeby się nie zasłaniały, gdy stoją na tym
-samym polu.
-
-**3. Kostka**
-Przycisk rzutu + widoczny wynik. Blokada w trakcie animacji ruchu, żeby nie dało
-się rzucić dwa razy.
-
-**4. Ruch pionka**
-Animacja pole po polu wzdłuż trasy. Wyciąg z 6 na 27 — osobna animacja wzdłuż
-linii kolejki, nie przez pola pośrednie.
-
-**5. Efekty pól**
-Rozstrzyganie z rozdziału 2 + flaga `podwojnyRzut` dla schronisk.
-
-**6. Stan tury i koniec gry**
-Kto teraz gra, ekran zwycięstwa, „jeszcze raz”.
-
-**7. Wpięcie w menu**
-Kafel „Górska przygoda” zamienia okno z podglądem na prawdziwy tryb gry —
-wtedy znika plakietka „w przygotowaniu”.
-
-### Stan gry — szkic
+### Stan gracza
 
 ```js
 const gracz = {
@@ -167,9 +169,16 @@ const gracz = {
 };
 ```
 
-Animacja ruchu musi liczyć czas tak samo jak reszta gier w `game.js`: stały krok
-1/60 s z akumulatorem, nie skalowanie jednym `dt`. Inaczej na słabszym PC pionek
-będzie się wlókł przy zaciętych klatkach.
+### Rytm tury
+
+Po każdym dymku gra przystaje na sekundę (`PAUZA_KLATEK`), żeby dało się
+przeczytać, co się stało. Kolejność jest zawsze taka sama:
+
+> rzut → kręcenie kostki → ruch pionka → plakietka efektu → **1 s** →
+> dymek postaci → **1 s** → tura drugiego gracza
+
+Pauza wstrzymuje sam przebieg gry, ale **nie** animacje — dymek w tym czasie
+normalnie się unosi i gaśnie.
 
 ---
 
@@ -190,282 +199,64 @@ Pilnuje tego `plansza-test.js`:
 
 ---
 
-## 7. Instrukcja dla agenta kodującego
+## 7. Pułapki w kodzie
 
-Wszystko dzieje się w `game.js`. Nowy tryb ma ten sam kształt co `badminton`
-i `obrona`: obiekt z `{ texts, measure, reset, update, draw, score, pointer, key }`,
-dopisany do `MODES`. Pętla, skalowanie płótna i menu są już wspólne.
+Rzeczy, na których łatwo się wyłożyć przy kolejnych zmianach. Wszystkie są już
+rozwiązane — to notatka, żeby ktoś tego nie „uprościł” z powrotem.
 
-### 7.1. Trzy pułapki — przeczytaj najpierw
+**Płótno ma dwie różne proporcje.** `FIELD_RATIO = 0.58` jest globalne i szerokie,
+a plansza jest wysoka (1536×2048 = 1,3333). Dlatego tryb podaje własne `ratio`,
+a `.game__stack--plansza` ogranicza szerokość wysokością okna — bez tego plansza
+wyjeżdża poza ekran.
 
-**a) Płótno ma złe proporcje.** `FIELD_RATIO = 0.58` jest globalne (płótno
-szerokie), a plansza jest wysoka — 1536×2048, czyli 1,3333. Trzeba zrobić
-proporcję zależną od trybu:
+**`pointer()` odpala się także przy `mousemove`.** Gdyby kostka była klikana przez
+płótno, samo przesunięcie myszy rzucałoby nią bez końca. Dlatego przycisk rzutu
+to `<button>` w DOM, a na płótnie jest tylko rysunek kostki.
 
-```js
-const FIELD_RATIO = 0.58;                 // zostaje jako domyslna
+**Czas liczymy w klatkach, nie w milisekundach.** Pętla woła `mode.update(1)`
+stałym krokiem 1/60 s. Żadnych `setTimeout` ani `Date.now()` w animacjach —
+inaczej wróci błąd, przez który pająki wlokły się na słabszym PC.
 
-// w resize():
-const ratioTrybu = (mode && mode.ratio) || FIELD_RATIO;
-canvas.style.height = Math.round(canvas.clientWidth * ratioTrybu) + "px";
-```
+**Powód dymka trzeba zapamiętać.** Dymek postaci leci na końcu tury, ale bonus
+z pola 12 kończy ruch na 14. Sam typ pola końcowego zgubiłby informację, że przed
+chwilą był bonus — stąd `state.powodGadki`.
 
-Do tego `.game__stack` ma `width: min(900px, 96vw)` — przy planszy dałoby to
-1200 px wysokości i plansza wyszłaby poza ekran. Dla tego trybu dodaj klasę:
+**Numery pól rysuje kod.** `drawPole()` dokłada numer do sprite'a. Bez tego
+plansza nie spełnia wymogu „każde pole ma numer" i nie da się policzyć ruchu
+wzrokiem.
 
-```css
-/* plansza jest wysoka, wiec szerokosc ograniczamy wysokoscia okna */
-.game__stack--plansza {
-    width: min(900px, 94vw, 60vh);
-}
-```
+**Dymki trzeba wpychać w kadr.** Pola specjalne stoją też przy krawędziach
+(np. 12 na `x=0.921`), więc pigułka bez przycięcia ucieka poza planszę.
 
-Klasę zdejmuj i nakładaj w `startMode()` / `showMenu()`.
+**Długie cofnięcia potrzebują szybszego kroku.** Zamieć cofa o 32 pola — w
+normalnym tempie to 13 sekund patrzenia, jak pionek pełznie. Stąd
+`KROK_KLATEK_SZYBKI` dla ruchów dłuższych niż `DLUGI_RUCH` pól.
 
-**b) `pointer()` odpala się też przy `mousemove`.** W `game.js` jest:
+---
 
-```js
-canvas.addEventListener("mousemove", (e) => handlePointer(...));
-```
+## 8. Jak sprawdzić, że działa
 
-Gdyby kostka była klikana przez `pointer()`, samo przesunięcie myszy nad
-planszą rzucałoby kostką w kółko. Dlatego **przycisk rzutu to zwykły
-`<button>` w DOM**, nie obszar na płótnie. Sama kostka jest rysowana na
-płótnie (żeby ładnie się kręciła), ale klik idzie z przycisku.
+`node plansza-test.js` — pełna lista kontrolna planszy.
 
-**c) Czas liczy się w klatkach, nie w milisekundach.** Pętla woła
-`mode.update(1)` stałym krokiem 1/60 s (patrz komentarz przy `FRAME_MS`).
-Wszystkie animacje licz w klatkach — `t += dt` — i **nigdy** nie używaj
-`Date.now()` ani `setTimeout` do animacji. Inaczej wróci błąd, przez który
-pająki wlokły się na słabszym PC.
+Haki testowe w `window.__game.gorska`: `setPole(id, nr)`, `rzut(wartosc)`,
+`state`. Do przewijania animacji bez czekania: `window.__game.update(1)` w pętli —
+pewniejsze niż `setTimeout`, bo `requestAnimationFrame` bywa wygaszany, gdy karta
+nie jest aktywnie renderowana.
 
-### 7.2. Co dodać poza `game.js`
+Ręcznie warto sprawdzić:
 
-**`index.html`** — pasek kostki wewnątrz `.game`, pod `.game__stack`:
-
-```html
-<div class="dice" id="dice" hidden>
-    <button class="dice__roll" id="dice-roll" type="button">🎲 Rzuć kostką</button>
-    <span class="dice__who" id="dice-who"></span>
-</div>
-```
-
-Podbij `?v=` przy `style.css`, `lines.js`, `script.js` i `game.js` — repo tego
-wymaga przy każdej zmianie (komentarz na górze `index.html`).
-
-**`game.js` → `SPRITE_FILES`** — dorzuć grafiki:
-
-```js
-plansza: "pic/plansza/board.webp",
-pionekJohny: "pic/plansza/pawn-johny.webp",
-pionekDeedee: "pic/plansza/pawn-deedee.webp",
-poleNormal: "pic/plansza/pole-normal.webp",
-poleShelter: "pic/plansza/pole-shelter.webp",
-poleBonus: "pic/plansza/pole-bonus.webp",
-poleWind: "pic/plansza/pole-wind.webp",
-poleView: "pic/plansza/pole-view.webp",
-poleSki: "pic/plansza/pole-ski.webp",
-poleHeart: "pic/plansza/pole-heart.webp",
-poleMeta: "pic/plansza/pole-meta.webp",
-```
-
-Pole `start` rysuje się spritem `poleHeart`, pole `lift` — `poleBonus`.
-
-**`lines.js` → `GAME_TEXTS`** — zamień wpis `wkrotce` na normalny tryb
-(`name`, `icon`, `blurb`, `hint`) i usuń `note: "w przygotowaniu"`; plakietkę
-`NEW` możesz zostawić. W `game.js` kafel przestaje mieć `data-preview`,
-a dostaje `data-mode="gorska"`. Okno podglądu (`#preview`) i jego CSS można
-wtedy usunąć.
-
-### 7.3. Stan trybu
-
-```js
-const state = {
-    gracze: [
-        { id: "johny",  nazwa: "Johnny",  pole: 1, podwojnyRzut: false, faza: 0 },
-        { id: "deedee", nazwa: "Dee Dee", pole: 1, podwojnyRzut: false, faza: 0 }
-    ],
-    ktory: 0,              // indeks gracza, losowany w reset()
-    faza: "rzut",          // rzut | kreci | rusza | efekt | koniec
-    kostka: { t: 0, oczko: 1, wynik: 0, drugiRzut: 0 },
-    ruch: null,            // { pola: [12,13,14], krok: 0, t: 0 }
-    dymki: [],             // patrz 7.5
-    blyski: []             // patrz 7.5
-};
-```
-
-`faza` pilnuje, żeby nie dało się rzucić kostką w trakcie ruchu — przycisk ma
-być wtedy `disabled`.
-
-### 7.4. Przebieg tury w kodzie
-
-1. **`rzut`** — przycisk aktywny. Klik → `faza = "kreci"`, `kostka.t = 0`.
-2. **`kreci`** — animacja z 7.6. Po jej końcu losujemy wynik
-   (`1 + rand(6)`; jeśli `podwojnyRzut`, drugi raz i sumujemy, a flagę zdejmujemy).
-   Budujemy `ruch.pola` = kolejne pola do przejścia, `faza = "rusza"`.
-3. **`rusza`** — pionek skacze pole po polu (7.6). Na końcu `faza = "efekt"`.
-4. **`efekt`** — rozstrzygamy pole, na którym stanął:
-   - pokaż dymek i błysk (7.5),
-   - jeśli efekt przesuwa gracza, dopisz drugi `ruch` (bez ponownego efektu —
-     patrz zasada z rozdziału 2),
-   - schronisko: `podwojnyRzut = true`,
-   - wyciąg (pole 6): przenieś na 27 osobną animacją wzdłuż linii kolejki,
-     nie przez pola pośrednie.
-5. Jeśli `pole >= 64` → `finish(...)` i `faza = "koniec"`.
-6. Jeśli obaj gracze na tym samym polu → dymek z serduszkiem.
-7. `ktory = 1 - ktory`, `faza = "rzut"`.
-
-Ograniczenia: `pole` nigdy poniżej 1 i nigdy powyżej 64.
-
-### 7.5. Szablon dymka — jeden na wszystkie pola specjalne
-
-To jest ten „efekt wow”, o który chodzi. **Jedna funkcja, używana wszędzie** —
-nie pisz osobnych animacji per typ pola.
-
-```js
-const DYMEK_KLATEK = 30;   // 0.5 s; jesli tekst nie zdazy sie przeczytac,
-                           // podnies do 45-55 - to jedna stala
-const BLYSK_KLATEK = 14;
-
-// nastroj: "dobry" (zielono, wesolo) albo "zly" (czerwono, smutno)
-function dymek(pole, tekst, nastroj) {
-    const p = TRASA[pole - 1];
-    state.dymki.push({
-        x: p.x, y: p.y, tekst, nastroj, t: 0,
-        bok: (Math.random() - 0.5) * 2   // kazdy dymek kolebie sie inaczej
-    });
-    state.blyski.push({ x: p.x, y: p.y, t: 0, nastroj });
-}
-```
-
-Rysowanie (wywoływane po planszy i pionkach, żeby było na wierzchu):
-
-```js
-const easeOut = (p) => 1 - Math.pow(1 - p, 3);
-
-state.dymki.forEach((d) => {
-    const p = d.t / DYMEK_KLATEK;                  // 0..1
-    const y = d.y * H - H * 0.075 * easeOut(p)     // unosi sie do gory
-            - H * 0.03;                            // startuje nad polem
-    const x = d.x * W + Math.sin(p * Math.PI * 1.6) * W * 0.022 * d.bok;
-    const skala = p < 0.25 ? 0.4 + 2.4 * p : 1;    // "pop" na wejsciu
-    const alpha = p < 0.15 ? p / 0.15               // wskakuje
-                : 1 - Math.max(0, (p - 0.55) / 0.45);  // i gasnie
-    // rysuj: tlo-pigulka + tekst, kolor wg nastroju
-    // dobry: #7ed957 / obrys #1c5e15,  zly: #ff5f6d / obrys #6e1119
-});
-```
-
-Błysk to rozszerzający się pierścień w miejscu pola:
-
-```js
-const p = b.t / BLYSK_KLATEK;
-promien = W * (0.02 + 0.05 * easeOut(p));
-grubosc = 6 * (1 - p);
-alpha   = 1 - p;
-```
-
-Teksty dymków — trzymaj je w jednym miejscu, obok reguł:
-
-| Pole | Tekst | Nastrój |
-|---|---|---|
-| bonus | `+2 BONUS 😃` | dobry |
-| view | `+1 WIDOK 😃` | dobry |
-| ski | `+3 ZJAZD 🎿` | dobry |
-| wind | `−2 WIATR 😖` | zły |
-| shelter | `RZUT 2× 😴` | dobry |
-| lift | `WYCIĄG! 🚡` | dobry |
-| spotkanie | `💗` | dobry |
-| meta | `META! 🏆` | dobry |
-
-### 7.6. Pozostałe animacje
-
-**Oddychanie pionków (gdy stoją).** Każdy pionek ma własną fazę, żeby nie
-oddychały równo:
-
-```js
-// reset(): g.faza = Math.random() * Math.PI * 2;
-// update(): g.faza += 0.055 * dt;              // pelny cykl ~1,9 s
-// draw():   const bob = Math.sin(g.faza) * H * 0.006;   // ~±5 px
-```
-
-Bob dodaj do `y` pionka **tylko gdy gracz nie jest w ruchu**.
-
-**Skok pionka między polami.**
-
-```js
-const KROK_KLATEK = 11;                  // ~0,18 s na pole
-const p = ruch.t / KROK_KLATEK;          // 0..1
-const a = TRASA[ruch.pola[ruch.krok] - 1];
-const b = TRASA[ruch.pola[ruch.krok + 1] - 1];
-x = (a.x + (b.x - a.x) * p) * W;
-y = (a.y + (b.y - a.y) * p) * H - Math.sin(p * Math.PI) * H * 0.03;  // parabola
-```
-
-Po `KROK_KLATEK` przejdź do następnego pola. Wyciąg 6 → 27: jeden długi krok
-(~40 klatek) po prostej, z pionkiem lekko kołyszącym się jak gondola.
-
-**Kostka.** Rysowana na płótnie w rogu planszy, kwadrat z zaokrąglonymi
-rogami i oczkami:
-
-```js
-const KRECENIE_KLATEK = 54;   // 0,9 s - miesci sie w zadanych 1-2 s
-// w fazie "kreci":
-kostka.t += dt;
-if (Math.floor(kostka.t) % 4 === 0) kostka.oczko = 1 + rand(6);  // migotanie scianek
-const p = kostka.t / KRECENIE_KLATEK;
-const kat = easeOut(p) * Math.PI * 6;      // trzy pelne obroty, zwalnia
-const skala = 1 + Math.sin(p * Math.PI) * 0.25;
-// po zakonczeniu: kostka.oczko = wynik i faza = "rusza"
-```
-
-Układ oczek — środek, przekątne, boki:
-
-```
-1: srodek
-2: LG, PD
-3: LG, srodek, PD
-4: LG, PG, LD, PD
-5: LG, PG, srodek, LD, PD
-6: LG, PG, LS, PS, LD, PD
-```
-
-**Gdy obaj gracze stoją na tym samym polu** — rozsuń pionki o `±W * 0.012`
-w poziomie, żeby się nie zasłaniały, i puść dymek z serduszkiem.
-
-### 7.7. Pozostałe drobiazgi
-
-- `score()` zwraca HTML na górny pasek: czyja tura i pozycje obu graczy,
-  np. `<b>Johnny</b><span class="game__points">12</span>` itd.
-- `measure()` — przelicz rozmiar pola i pionka względem `W`; wywoływane
-  z `resize()`.
-- `key()` może zostać puste (`() => {}`) albo pozwalać na rzut spacją.
-- **`prefers-reduced-motion`** — w `style.css` jest już blok dla tego
-  ustawienia. Uszanuj je: przy włączonym skróć kręcenie kostki do ~10 klatek,
-  wyłącz oddychanie i skoki (pionek przeskakuje od razu), dymki zostaw, ale
-  bez kołysania na boki.
-- Nie ruszaj `plansza-trasa.js` — to dane, nie logika. Zmiana reguły idzie
-  najpierw do tego dokumentu, potem do kodu.
-
-### 7.8. Jak sprawdzić, że działa
-
-`plansza-test.js` sprawdza samą planszę. Do mechaniki dopisz do
-`window.__game` haki testowe (wzorem istniejących), żeby dało się przewinąć
-grę bez czekania na animacje — np. `setPole(gracz, nr)`, `rzut(wartosc)`.
-
-Ręcznie sprawdź:
 - rzut kostką nie działa w trakcie ruchu pionka,
-- bonus na polu 12 przesuwa na 14 i **nie** odpala efektu pola 14,
+- bonus z pola 12 przesuwa na 14 i **nie** odpala efektu pola 14,
 - wiatr na polu 4 nie cofa poniżej pola 1,
-- wejście na pole 6 przenosi na 27 animacją wzdłuż kolejki,
-- schronisko daje w następnej turze sumę dwóch rzutów i flaga się zdejmuje,
+- lawina z pola 45 cofa na 35, zamieć z pola 60 zrzuca na 28,
+- schronisko daje w następnej turze sumę dwóch rzutów, a flaga się zdejmuje,
 - rzut z pola 62 wynikiem 5 kończy grę (nadmiar przepada),
 - obaj gracze na jednym polu → serduszko i rozsunięte pionki,
 - plansza mieści się w oknie na telefonie i na laptopie 1280×720.
 
 ---
 
-## 8. Styl grafiki
+## 9. Styl grafiki
 
 Kreskówkowo, grube czarne kontury, żywe kolory: zielone lasy, skaliste granie,
 śnieg na szczycie, drewniane schroniska, wyciąg, wodospad, obserwatorium na

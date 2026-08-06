@@ -21,7 +21,9 @@
         poleView: "pic/plansza/pole-view.webp",
         poleSki: "pic/plansza/pole-ski.webp",
         poleHeart: "pic/plansza/pole-heart.webp",
-        poleMeta: "pic/plansza/pole-meta.webp"
+        poleMeta: "pic/plansza/pole-meta.webp",
+        poleLawina: "pic/plansza/pole-lawina.webp",
+        poleZamiec: "pic/plansza/pole-zamiec.webp"
     };
 
     const sprites = {};
@@ -42,6 +44,8 @@
     const diceEl = document.getElementById("dice");
     const diceRollBtn = document.getElementById("dice-roll");
     const diceWhoEl = document.getElementById("dice-who");
+    const rulesBtn = document.getElementById("game-rules");
+    const rulesEl = document.getElementById("rules");
 
     const FIELD_RATIO = 0.58;
 
@@ -496,6 +500,13 @@
         const SERCE_SKALA = 3;     // i jest wyraznie wieksze od zwyklej plakietki
         const BLYSK_KLATEK = 14;
         const KROK_KLATEK = 18;    // ~0,3 s na jeden skok miedzy sasiednimi polami
+        const KROK_KLATEK_SZYBKI = 5;   // dlugie cofniecia (lawina, zamiec)
+        const DLUGI_RUCH = 8;      // od tylu pol ruch przechodzi na szybkie tempo
+
+        // Zamiec cofa az o 32 pola - w normalnym tempie to 13 sekund patrzenia,
+        // jak pionek pelznie w dol. Przy dlugich odcinkach skracamy krok, przez
+        // co zjazd wyglada jak porwanie przez zywiol, a nie jak spacer.
+        const tempoRuchu = (pola) => (pola.length > DLUGI_RUCH ? KROK_KLATEK_SZYBKI : KROK_KLATEK);
         const WYCIAG_KLATEK = 55;  // dlugi, plynny przejazd kolejka (nie przez pola posrednie)
         const GADKA_KLATEK = 120;  // 2 s - dymek postaci, pokazuje sie na koncu tury
         const GADKA_SZANSA_ZWYKLE = 0.34;  // na zwyklych polach tylko co jakis czas
@@ -516,7 +527,9 @@
             wind: { tekst: "−2 WIATR 😖", nastroj: "zly" },
             shelter: { tekst: "RZUT 2× 😴", nastroj: "dobry" },
             lift: { tekst: "WYCIĄG! 🚡", nastroj: "dobry" },
-            meta: { tekst: "META! 🏆", nastroj: "dobry" }
+            meta: { tekst: "META! 🏆", nastroj: "dobry" },
+            lawina: { tekst: "LAWINA! −10 😱", nastroj: "zly" },
+            zamiec: { tekst: "ZAMIEĆ! W DÓŁ 🥶", nastroj: "zly" }
         };
 
         const POLE_SPRITE = {
@@ -528,7 +541,9 @@
             ski: "poleSki",
             start: "poleHeart",
             meta: "poleMeta",
-            lift: "poleBonus"
+            lift: "poleBonus",
+            lawina: "poleLawina",
+            zamiec: "poleZamiec"
         };
 
         // 0.22 zamiast 0.28 - oczka siedza blizej srodka, wiec maja wiekszy
@@ -661,7 +676,8 @@
         function ruszDalej(gracz, docelowe) {
             const cel = Math.max(1, Math.min(64, docelowe));
             if (cel === gracz.pole) { zakonczRuch(gracz); return; }
-            state.ruch = { pola: polaOd(gracz.pole, cel), krok: 0, t: 0, zliczEfekt: false, gracz };
+            const pola = polaOd(gracz.pole, cel);
+            state.ruch = { pola, krok: 0, t: 0, tempo: tempoRuchu(pola), zliczEfekt: false, gracz };
             state.faza = "rusza";
         }
 
@@ -693,6 +709,24 @@
             if (typ === "view") { dymek(pole, DYMKI_POL.view.tekst, DYMKI_POL.view.nastroj); zPauza("+1 za widok 🔭", () => ruszDalej(gracz, pole + 1)); return; }
             if (typ === "ski") { dymek(pole, DYMKI_POL.ski.tekst, DYMKI_POL.ski.nastroj); zPauza("+3 za zjazd 🎿", () => ruszDalej(gracz, pole + 3)); return; }
             if (typ === "wind") { dymek(pole, DYMKI_POL.wind.tekst, DYMKI_POL.wind.nastroj); zPauza("−2 za wiatr 🌬️", () => ruszDalej(gracz, pole - 2)); return; }
+
+            // Pola-katastrofy: te dwa robia z gry dramat. Cofaja na tyle daleko,
+            // ze warto pokazac to jako osobny, dlugi zjazd - dlatego lecą przez
+            // wszystkie pola po drodze, tak jak zwykly ruch.
+            if (typ === "lawina") {
+                dymek(pole, DYMKI_POL.lawina.tekst, DYMKI_POL.lawina.nastroj);
+                const cel = Math.max(1, pole - KATASTROFY.lawina.cofa);
+                zPauza(`LAWINA! −${KATASTROFY.lawina.cofa} pól, z powrotem na ${cel} 😱`,
+                    () => ruszDalej(gracz, cel));
+                return;
+            }
+            if (typ === "zamiec") {
+                dymek(pole, DYMKI_POL.zamiec.tekst, DYMKI_POL.zamiec.nastroj);
+                const cel = KATASTROFY.zamiec.doPola;
+                zPauza(`ZAMIEĆ! z powrotem do Samotni, pole ${cel} 🥶`,
+                    () => ruszDalej(gracz, cel));
+                return;
+            }
             if (typ === "shelter") {
                 dymek(pole, DYMKI_POL.shelter.tekst, DYMKI_POL.shelter.nastroj);
                 gracz.podwojnyRzut = true;
@@ -808,7 +842,8 @@
             state.wynikT = 0;   // liczba wyskakuje na kostce
 
             const cel = Math.min(64, gracz.pole + wynik);
-            state.ruch = { pola: polaOd(gracz.pole, cel), krok: 0, t: 0, zliczEfekt: true, gracz };
+            const pola = polaOd(gracz.pole, cel);
+            state.ruch = { pola, krok: 0, t: 0, tempo: tempoRuchu(pola), zliczEfekt: true, gracz };
             state.faza = "rusza";
         }
 
@@ -829,9 +864,10 @@
                 return;
             }
 
+            const krok = ruch.tempo || KROK_KLATEK;
             ruch.t += dt;
-            while (ruch.t >= KROK_KLATEK && ruch.krok < ruch.pola.length - 1) {
-                ruch.t -= KROK_KLATEK;
+            while (ruch.t >= krok && ruch.krok < ruch.pola.length - 1) {
+                ruch.t -= krok;
                 ruch.krok++;
             }
             if (ruch.krok >= ruch.pola.length - 1) zakonczSkoki(ruch);
@@ -942,7 +978,7 @@
                 py = (a.y + (b.y - a.y) * p) * H + (rm ? 0 : Math.sin(p * Math.PI * 6) * H * 0.01);
             } else if (wRuchu) {
                 const ruch = state.ruch;
-                const p = Math.min(1, ruch.t / KROK_KLATEK);
+                const p = Math.min(1, ruch.t / (ruch.tempo || KROK_KLATEK));
                 const idxB = Math.min(ruch.krok + 1, ruch.pola.length - 1);
                 const a = TRASA[ruch.pola[ruch.krok] - 1];
                 const b = TRASA[ruch.pola[idxB] - 1];
@@ -1302,6 +1338,45 @@
         overEl.hidden = false;
     }
 
+    // ---------- zasady ----------
+
+    // Tresc budujemy raz, przy pierwszym otwarciu - ikony pol sa te same pliki,
+    // ktore rysuje plansza, wiec legenda nie moze sie z nia rozjechac.
+    let zasadyGotowe = false;
+
+    function zbudujZasady() {
+        if (zasadyGotowe) return;
+        document.getElementById("rules-title").textContent = ZASADY.tytul;
+        document.getElementById("rules-body").innerHTML =
+            `<p class="rules__cel">${ZASADY.cel}</p>`
+            + `<ul class="rules__list">`
+            + ZASADY.pola.map((p) => `<li class="rules__item${p.straszne ? " rules__item--strasz" : ""}">
+                    <img class="rules__icon" src="pic/plansza/${p.ikona}.webp" alt="">
+                    <span class="rules__name">${p.nazwa}</span>
+                    <span class="rules__desc">${p.opis}</span>
+                </li>`).join("")
+            + `</ul><p class="rules__note">${ZASADY.uwaga}</p>`;
+        zasadyGotowe = true;
+    }
+
+    function otworzZasady() {
+        zbudujZasady();
+        rulesEl.hidden = false;
+        document.getElementById("rules-close").focus();
+    }
+
+    const zamknijZasady = () => { rulesEl.hidden = true; };
+
+    rulesBtn.addEventListener("click", (e) => { e.stopPropagation(); otworzZasady(); });
+    document.getElementById("rules-close").addEventListener("click", (e) => {
+        e.stopPropagation();
+        zamknijZasady();
+    });
+    rulesEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (e.target === rulesEl) zamknijZasady();   // klik w tlo zamyka
+    });
+
     let lastFrame = 0;
     let acc = 0;            // nieprzetworzony czas symulacji w ms
     let lastScore = "";     // ostatnio wypisany wynik - nie ruszamy DOM co klatke
@@ -1350,8 +1425,10 @@
         // plansza gorska jest wysoka - bez tej klasy .game__stack (width: min(900px,
         // 96vw)) dawaloby jej ~1200px wysokosci i wyjezdzalaby poza ekran (pulapka 7.1a)
         stackEl.classList.toggle("game__stack--plansza", !!mode.ratio);
-        // pasek kostki istnieje tylko dla trybu, ktory definiuje roll()
+        // pasek kostki i zasady istnieja tylko dla trybu, ktory definiuje roll()
         diceEl.hidden = !mode.roll;
+        rulesBtn.hidden = !mode.roll;
+        rulesEl.hidden = true;
 
         resize();
         mode.reset();
@@ -1370,6 +1447,8 @@
         backEl.hidden = true;
         stackEl.classList.remove("game__stack--plansza");
         diceEl.hidden = true;
+        rulesBtn.hidden = true;
+        rulesEl.hidden = true;
         scoreEl.innerHTML = "";
         lastScore = "";
         hintEl.textContent = "";
@@ -1422,8 +1501,10 @@
 
     document.addEventListener("keydown", (e) => {
         if (gameEl.hidden) return;
-        if (e.key === "Escape") return close();
-        if (mode && running) mode.key(e);
+        // Escape zamyka najpierw zasady, dopiero potem cala gre
+        if (e.key === "Escape") return rulesEl.hidden ? close() : zamknijZasady();
+        // przy otwartych zasadach spacja nie moze rzucac kostka w tle
+        if (mode && running && rulesEl.hidden) mode.key(e);
     });
 
     // ---------- otwieranie i zamykanie ----------

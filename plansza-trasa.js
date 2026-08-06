@@ -79,7 +79,9 @@ const TRASA = [
     { x: 0.128, y: 0.362, type: "normal" },
     { x: 0.132, y: 0.320, type: "view", name: "Przełęcz Karkonoska" },
     { x: 0.112, y: 0.278, type: "normal" },
-    { x: 0.102, y: 0.236, type: "normal" },
+    // Kotly polodowcowe to realny teren lawinowy - stad tu najgorsze pole
+    // dolnej czesci trasy.
+    { x: 0.102, y: 0.236, type: "lawina", name: "Lawina w Śnieżnych Kotłach" },
     { x: 0.105, y: 0.194, type: "normal" },
     { x: 0.122, y: 0.158, type: "view", name: "Śnieżne Kotły" },
 
@@ -99,7 +101,9 @@ const TRASA = [
 
     // --- 59-64: podejscie z lancuchami na szczyt ---
     { x: 0.812, y: 0.258, type: "normal" },
-    { x: 0.775, y: 0.222, type: "wind" },
+    // Najokrutniejsze pole planszy: trzy kroki od szczytu zamiec sprowadza
+    // gracza az do Samotni nad Malym Stawem.
+    { x: 0.775, y: 0.222, type: "zamiec", name: "Zamieć pod szczytem" },
     { x: 0.745, y: 0.186, type: "normal" },
     { x: 0.715, y: 0.152, type: "normal" },
     { x: 0.690, y: 0.122, type: "normal" },
@@ -111,4 +115,11 @@ const TRASA = [
 // Przeskok o 21 pol, czyli mniej wiecej tyle, co proponowane "z 12 na 25".
 const WYCIAG = { from: 6, to: 27 };
 
-if (typeof module !== "undefined") module.exports = { TRASA, WYCIAG };
+// Pola-katastrofy. Trzymamy je obok wyciagu, bo tak jak on przenosza gracza
+// w konkretne miejsce, zamiast tylko przesuwac o kilka pol.
+const KATASTROFY = {
+    lawina: { cofa: 10 },      // zjazd z lawina o dziesiec pol w dol
+    zamiec: { doPola: 28 }     // zamiec spycha az do Samotni nad Malym Stawem
+};
+
+if (typeof module !== "undefined") module.exports = { TRASA, WYCIAG, KATASTROFY };

@@ -1,6 +1,6 @@
 // Lista kontrolna planszy z docs/akcja-w-karkonoszach.md, punkt 11.
 // Uruchom: node plansza-test.js
-const { TRASA, WYCIAG } = require("./plansza-trasa.js");
+const { TRASA, WYCIAG, KATASTROFY } = require("./plansza-trasa.js");
 
 let bledy = 0;
 const ok = (warunek, opis) => {
@@ -27,6 +27,24 @@ ok(WYCIAG.to > WYCIAG.from && WYCIAG.to <= 64, `wyciąg ${WYCIAG.from} → ${WYC
 // wyciag nie moze psuc zwyklej numeracji - pola miedzy nim a celem istnieja
 ok(TRASA.slice(WYCIAG.from, WYCIAG.to).length === WYCIAG.to - WYCIAG.from,
     "wyciąg nie wycina pól z normalnej trasy");
+
+// --- pola-katastrofy ---
+const lawina = TRASA.findIndex((f) => f.type === "lawina") + 1;
+const zamiec = TRASA.findIndex((f) => f.type === "zamiec") + 1;
+
+ok(lawina > 0, `na planszy jest pole lawiny (pole ${lawina})`);
+ok(zamiec > 0, `na planszy jest pole zamieci (pole ${zamiec})`);
+
+// lawina ma cofac, ale nie wyrzucac z planszy
+ok(lawina - KATASTROFY.lawina.cofa >= 1,
+    `lawina cofa o ${KATASTROFY.lawina.cofa} i nie schodzi poniżej pola 1 (${lawina} → ${lawina - KATASTROFY.lawina.cofa})`);
+
+// zamiec ma byc blisko szczytu, inaczej nie boli
+ok(zamiec >= 55, `zamieć stoi tuż pod szczytem (pole ${zamiec})`);
+ok(KATASTROFY.zamiec.doPola < zamiec,
+    `zamieć cofa do pola ${KATASTROFY.zamiec.doPola}, czyli faktycznie w dół`);
+ok(TRASA[KATASTROFY.zamiec.doPola - 1].type === "shelter",
+    `zamieć zrzuca na schronisko (pole ${KATASTROFY.zamiec.doPola} to ${TRASA[KATASTROFY.zamiec.doPola - 1].name || "schronisko"})`);
 
 // wszystkie pola w kadrze i nie na sobie
 ok(TRASA.every((f) => f.x > 0.02 && f.x < 0.98 && f.y > 0.02 && f.y < 0.98),

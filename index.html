@@ -17,7 +17,7 @@
          na swiezy index.html. Numer w adresie to lamie.
          PRZY KAZDEJ ZMIANIE style.css, lines.js, script.js albo game.js
          podbij ten numer we wszystkich czterech linijkach. -->
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
     <!-- przykrywa scene, dopoki wszystkie obrazki nie beda gotowe -->
@@ -110,6 +110,8 @@
         <div class="game__bar">
             <button class="game__back" id="game-back" type="button" hidden>◀ Menu</button>
             <span class="game__score" id="game-score"></span>
+            <button class="game__rules" id="game-rules" type="button" hidden
+                aria-label="Zasady gry">? Zasady</button>
             <button class="game__close" id="game-close" type="button" aria-label="Zamknij grę">✕</button>
         </div>
 
@@ -135,6 +137,16 @@
         </div>
 
         <p class="game__hint" id="game-hint"></p>
+
+        <!-- zasady spod przycisku "? Zasady" - tresc buduje game.js z ZASADY -->
+        <div class="rules" id="rules" hidden>
+            <div class="rules__box">
+                <button class="rules__close" id="rules-close" type="button"
+                    aria-label="Zamknij zasady">✕</button>
+                <h2 class="rules__title" id="rules-title"></h2>
+                <div class="rules__body" id="rules-body"></div>
+            </div>
+        </div>
     </div>
 
     <aside class="plan" id="plan" hidden>
@@ -146,9 +158,9 @@
     <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
     <div class="fx" id="fx" aria-hidden="true"></div>
 
-    <script src="lines.js?v=11"></script>
-    <script src="script.js?v=11"></script>
-    <script src="plansza-trasa.js?v=1"></script>
-    <script src="game.js?v=12"></script>
+    <script src="lines.js?v=12"></script>
+    <script src="script.js?v=12"></script>
+    <script src="plansza-trasa.js?v=2"></script>
+    <script src="game.js?v=14"></script>
 </body>
 </html>

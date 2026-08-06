@@ -130,6 +130,27 @@ const GAME_TEXTS = {
     }
 };
 
+// Zasady pokazywane pod przyciskiem "? Zasady" w trybie planszowym.
+// Pelny opis siedzi w docs/akcja-w-karkonoszach.md - tutaj jest skrot dla gracza.
+const ZASADY = {
+    tytul: "Górska przygoda — zasady",
+    cel: "Rzucacie na zmianę kostką i idziecie polami z Karpacza na Śnieżkę. Wygrywa ten, kto pierwszy stanie na polu 64. Nie trzeba trafić dokładnie — nadmiar przepada.",
+    pola: [
+        { ikona: "pole-normal", nazwa: "Zwykłe pole", opis: "Nic się nie dzieje." },
+        { ikona: "pole-shelter", nazwa: "Schronisko", opis: "W następnej turze rzucasz 2× i sumujesz." },
+        { ikona: "pole-bonus", nazwa: "Bonus", opis: "Idziesz 2 pola do przodu." },
+        { ikona: "pole-view", nazwa: "Punkt widokowy", opis: "Idziesz 1 pole do przodu." },
+        { ikona: "pole-ski", nazwa: "Narciarz", opis: "Zjazd: 3 pola do przodu." },
+        { ikona: "pole-wind", nazwa: "Wiatr", opis: "Cofasz się o 2 pola." },
+        { ikona: "pole-bonus", nazwa: "Wyciąg — pole 6", opis: "Wjeżdżasz kolejką aż na pole 27." },
+        { ikona: "pole-lawina", nazwa: "Lawina — pole 45", opis: "Cofasz się aż o 10 pól!", straszne: true },
+        { ikona: "pole-zamiec", nazwa: "Zamieć — pole 60", opis: "Trzy kroki od szczytu wracasz do Samotni, na pole 28!", straszne: true },
+        { ikona: "pole-heart", nazwa: "Serduszko", opis: "Gdy oboje staniecie na tym samym polu." },
+        { ikona: "pole-meta", nazwa: "Meta — pole 64", opis: "Szczyt Śnieżki. Koniec gry." }
+    ],
+    uwaga: "Efekt pola działa tylko wtedy, gdy staniesz na nim rzutem kostki. Jeśli trafisz tam przez inny efekt — pole milczy."
+};
+
 // Dymki postaci w gre planszowej. Pokazuja sie na koncu tury: po rzucie, po
 // dojsciu pionka na pole i po plakietce z efektem.
 //
@@ -163,6 +184,33 @@ const GAME_BUBBLES = {
             "O kurczę, już go nie dogonię 😩🌬️",
             "Wiatr zniszczył mi fryzurę! 💇‍♀️😤",
             "Kto zamówił halny?! 🌬️😖"
+        ]
+    },
+
+    // dwa pola-katastrofy - tu postacie maja prawo panikowac
+    lawina: {
+        johny: [
+            "Backup mam. Siebie nie 😱❄️",
+            "Za moich czasów śnieg leżał! 👴❄️",
+            "Dziesięć pól. Policzyłem 📊😰"
+        ],
+        deedee: [
+            "Moje włosy! I moje pola! 😱💇‍♀️",
+            "Zjechałam. Nie tak to planowałam ❄️😭",
+            "Loki, ratuj mnie stąd! 🐕😰"
+        ]
+    },
+
+    zamiec: {
+        johny: [
+            "Byłem trzy pola od szczytu… 🥶💔",
+            "Ktoś wyłączył mi zasilanie 🔌🥶",
+            "Wracam. Znowu. Bez okularów 🤓🥶"
+        ],
+        deedee: [
+            "NIE. Ja tam byłam! 🥶😭",
+            "Zjazd do Samotni. Chociaż kawa ☕🥶",
+            "Kto zamówił tę zamieć?! 🥶😤"
         ]
     },
 
